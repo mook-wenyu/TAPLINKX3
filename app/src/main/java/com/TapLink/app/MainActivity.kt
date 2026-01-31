@@ -280,16 +280,6 @@ class MainActivity :
     private var shouldResetInitialQuaternion = false
     private var pendingDoubleTapAction = false
 
-    private val SCROLL_MODE_TIMEOUT = 60000L // 60 seconds in milliseconds
-    private var scrollModeHandler = Handler(Looper.getMainLooper())
-    private var scrollModeRunnable = Runnable {
-        if (isCursorVisible && !isKeyboardVisible && !dualWebViewGroup.isMediaPlaying()) {
-            // Switch to scroll mode
-            // Cursor remains visible
-            dualWebViewGroup.setScrollMode(true)
-        }
-    }
-
     private var ipcLauncher: Launcher? = null
     private var gpsUpdatesRegistered = false
     private val gpsHandler = Handler(Looper.getMainLooper())
@@ -306,7 +296,8 @@ class MainActivity :
     private var lastTapTime = 0L
     private var firstTapTime = 0L
     private var tapCount = 0
-    private val TRIPLE_TAP_TIMEOUT = 500L // Total window for triple-tap sequence
+    private val TAP_INTERVAL = 400L // Max time between consecutive taps
+    private val TRIPLE_TAP_DURATION = 800L // Max time for entire 3-tap sequence
     private var isTripleTapInProgress = false
 
     private var settingsMenu: View? = null
@@ -338,6 +329,12 @@ class MainActivity :
 
     private var pendingTouchHandler: Handler? = null
     private var pendingTouchRunnable: Runnable? = null
+
+    // Touch scroll simulation state for mobile mode
+    private var isTouchScrollActive = false
+    private var touchScrollDownTime = 0L
+    private var touchScrollCurrentY = 240f // Start at center
+    private var accumulatedScrollY = 0f // Accumulate small scroll deltas
 
     private val notificationReceiver =
             object : BroadcastReceiver() {
@@ -445,6 +442,7 @@ class MainActivity :
                         object : SimpleOnGestureListener() {
                             private var isProcessingTap = false
                             private var totalScrollDistance = 0f
+                            private var doubleTapRunnable: Runnable? = null
 
                             override fun onDown(e: MotionEvent): Boolean {
                                 totalScrollDistance = 0f
@@ -468,7 +466,7 @@ class MainActivity :
 
                                 // Triple tap detection for screen re-centering in anchored mode
                                 val currentTime = System.currentTimeMillis()
-                                if (currentTime - lastTapTime > TRIPLE_TAP_TIMEOUT) {
+                                if (currentTime - lastTapTime > TAP_INTERVAL) {
                                     DebugLog.d("TripleTapDebug", "Starting new tap sequence")
                                     tapCount = 1
                                     firstTapTime = currentTime
@@ -482,29 +480,44 @@ class MainActivity :
                                 }
                                 lastTapTime = currentTime
 
-                                // Check for triple tap (only works in anchored mode)
-                                if (isAnchored &&
-                                                tapCount == 3 &&
-                                                (currentTime - firstTapTime) <= TRIPLE_TAP_TIMEOUT
+                                // Check for triple tap
+                                if (tapCount == 3 &&
+                                                (currentTime - firstTapTime) <= TRIPLE_TAP_DURATION
                                 ) {
                                     DebugLog.d(
                                             "TripleTapDebug",
                                             "Triple tap detected! Time from first tap: ${currentTime - firstTapTime}ms"
                                     )
+                                    // Explicitly cancel the specific double tap runnable
+                                    doubleTapRunnable?.let { handler.removeCallbacks(it) }
+                                    doubleTapRunnable = null
+
                                     handler.removeCallbacksAndMessages(null)
                                     synchronized(doubleTapLock) { pendingDoubleTapAction = false }
                                     isTripleTapInProgress = true
-
-                                    // Reset translations to center the view
-                                    shouldResetInitialQuaternion = true
-                                    dualWebViewGroup.updateLeftEyePosition(
-                                            0f,
-                                            0f,
-                                            0f
-                                    ) // Reset translations and rotation
-                                    dualWebViewGroup.showToast("Screen Re-centered")
-
                                     tapCount = 0
+
+                                    if (isAnchored) {
+                                        // Reset translations to center the view
+                                        shouldResetInitialQuaternion = true
+                                        dualWebViewGroup.updateLeftEyePosition(
+                                                0f,
+                                                0f,
+                                                0f
+                                        ) // Reset translations and rotation
+                                        dualWebViewGroup.showToast("Screen Re-centered")
+                                    } else {
+                                        // Non-anchored triple tap: Toggle Scroll Mode
+                                        if (dualWebViewGroup.isInScrollMode()) {
+                                            toggleCursorVisibility(forceShow = true)
+                                            dualWebViewGroup.showToast("Cursor mode activated")
+                                        } else {
+                                            toggleCursorVisibility(forceHide = true)
+                                            dualWebViewGroup.showToast(
+                                                    "Scroll mode activated, triple tap again to leave"
+                                            )
+                                        }
+                                    }
                                     return true
                                 }
 
@@ -539,8 +552,9 @@ class MainActivity :
                                                 distanceX * distanceX + distanceY * distanceY
                                         )
 
-                                // When ANCHORED: both X and Y move the page vertically
-                                if (isAnchored &&
+                                // When ANCHORED or SCROLL MODE: both X and Y move the page
+                                // vertically
+                                if ((isAnchored || dualWebViewGroup.isInScrollMode()) &&
                                                 !isKeyboardVisible &&
                                                 !dualWebViewGroup.isScreenMasked()
                                 ) {
@@ -554,38 +568,213 @@ class MainActivity :
                                             (horizontalAsVertical + verticalFromDrag) / scale
 
                                     if (kotlin.math.abs(verticalDelta) >= 1f) {
-                                        val pointerCoords = MotionEvent.PointerCoords()
-                                        pointerCoords.x = 320f
-                                        pointerCoords.y = 240f
-                                        pointerCoords.setAxisValue(
-                                                MotionEvent.AXIS_VSCROLL,
-                                                verticalDelta / 30f
-                                        )
+                                        if (dualWebViewGroup.isDesktopMode()) {
+                                            // Desktop mode: Use mouse scroll wheel simulation
+                                            val pointerCoords = MotionEvent.PointerCoords()
+                                            pointerCoords.x = 320f
+                                            pointerCoords.y = 240f
+                                            pointerCoords.setAxisValue(
+                                                    MotionEvent.AXIS_VSCROLL,
+                                                    verticalDelta / 30f
+                                            )
 
-                                        val pointerProperties = MotionEvent.PointerProperties()
-                                        pointerProperties.id = 0
-                                        pointerProperties.toolType = MotionEvent.TOOL_TYPE_MOUSE
+                                            val pointerProperties = MotionEvent.PointerProperties()
+                                            pointerProperties.id = 0
+                                            pointerProperties.toolType = MotionEvent.TOOL_TYPE_MOUSE
 
-                                        val event =
-                                                MotionEvent.obtain(
-                                                        SystemClock.uptimeMillis(),
-                                                        SystemClock.uptimeMillis(),
-                                                        MotionEvent.ACTION_SCROLL,
-                                                        1,
-                                                        arrayOf(pointerProperties),
-                                                        arrayOf(pointerCoords),
-                                                        0,
-                                                        0,
-                                                        1.0f,
-                                                        1.0f,
-                                                        0,
-                                                        0,
-                                                        InputDevice.SOURCE_MOUSE,
-                                                        0
-                                                )
+                                            val event =
+                                                    MotionEvent.obtain(
+                                                            SystemClock.uptimeMillis(),
+                                                            SystemClock.uptimeMillis(),
+                                                            MotionEvent.ACTION_SCROLL,
+                                                            1,
+                                                            arrayOf(pointerProperties),
+                                                            arrayOf(pointerCoords),
+                                                            0,
+                                                            0,
+                                                            1.0f,
+                                                            1.0f,
+                                                            0,
+                                                            0,
+                                                            InputDevice.SOURCE_MOUSE,
+                                                            0
+                                                    )
 
-                                        webView.dispatchGenericMotionEvent(event)
-                                        event.recycle()
+                                            webView.dispatchGenericMotionEvent(event)
+                                            event.recycle()
+                                        } else {
+                                            // Mobile mode: Use touch swipe simulation
+                                            val now = SystemClock.uptimeMillis()
+
+                                            // Accumulate scroll delta for smoother swiping
+                                            accumulatedScrollY += verticalDelta
+
+                                            if (!isTouchScrollActive) {
+                                                // Prevent accidental clicks by requiring a minimum
+                                                // movement threshold
+                                                // before starting a swipe gesture. 15px is
+                                                // typically safe for touch slop.
+                                                if (kotlin.math.abs(accumulatedScrollY) < 15f) {
+                                                    return true
+                                                }
+
+                                                // Start a new touch gesture at the last known
+                                                // cursor position
+                                                isTouchScrollActive = true
+                                                touchScrollDownTime = now
+                                                // Use last known cursor X/Y to ensure we scroll the
+                                                // correct element
+                                                touchScrollCurrentY = lastCursorY
+                                                // accumulatedScrollY is valid and > threshold,
+                                                // proceed using it
+
+                                                val downEvent =
+                                                        MotionEvent.obtain(
+                                                                touchScrollDownTime,
+                                                                now,
+                                                                MotionEvent.ACTION_DOWN,
+                                                                lastCursorX,
+                                                                touchScrollCurrentY,
+                                                                0
+                                                        )
+                                                downEvent.source = InputDevice.SOURCE_TOUCHSCREEN
+                                                isSimulatingTouchEvent = true
+                                                try {
+                                                    webView.dispatchTouchEvent(downEvent)
+                                                } finally {
+                                                    isSimulatingTouchEvent = false
+                                                }
+                                                downEvent.recycle()
+                                            }
+
+                                            // Apply scroll delta (Positive delta = Move DOWN = Drag
+                                            // DOWN)
+                                            // User wants: Swipe Forward (Up/Neg) -> Go Down (Scroll
+                                            // Down)
+                                            // Scroll Down -> Drag UP (Decrease Y)
+                                            // So if Delta < 0, we want CurrentY to DECREASE.
+                                            // So we ADD delta.
+                                            var candidateY =
+                                                    touchScrollCurrentY + accumulatedScrollY
+
+                                            // Check bounds and loop gesture if needed to allow
+                                            // continuous scrolling
+                                            if (candidateY < 10f || candidateY > 470f) {
+                                                // End current gesture with CANCEL to prevent acting
+                                                // as a click at the edge
+                                                val cancelEvent =
+                                                        MotionEvent.obtain(
+                                                                touchScrollDownTime,
+                                                                now,
+                                                                MotionEvent.ACTION_CANCEL,
+                                                                lastCursorX,
+                                                                touchScrollCurrentY,
+                                                                0
+                                                        )
+                                                cancelEvent.source = InputDevice.SOURCE_TOUCHSCREEN
+                                                isSimulatingTouchEvent = true
+                                                try {
+                                                    webView.dispatchTouchEvent(cancelEvent)
+                                                } finally {
+                                                    isSimulatingTouchEvent = false
+                                                }
+                                                cancelEvent.recycle()
+
+                                                // Reset to center to regain runway
+                                                touchScrollCurrentY = 240f
+                                                touchScrollDownTime = now
+
+                                                // Start new gesture
+                                                val downEvent =
+                                                        MotionEvent.obtain(
+                                                                touchScrollDownTime,
+                                                                now,
+                                                                MotionEvent.ACTION_DOWN,
+                                                                lastCursorX,
+                                                                touchScrollCurrentY,
+                                                                0
+                                                        )
+                                                downEvent.source = InputDevice.SOURCE_TOUCHSCREEN
+                                                isSimulatingTouchEvent = true
+                                                try {
+                                                    webView.dispatchTouchEvent(downEvent)
+                                                } finally {
+                                                    isSimulatingTouchEvent = false
+                                                }
+                                                downEvent.recycle()
+
+                                                // Re-calculate candidate
+                                                candidateY =
+                                                        touchScrollCurrentY + accumulatedScrollY
+                                            }
+
+                                            touchScrollCurrentY = candidateY.coerceIn(0f, 480f)
+                                            accumulatedScrollY = 0f
+
+                                            val moveEvent =
+                                                    MotionEvent.obtain(
+                                                            touchScrollDownTime,
+                                                            now,
+                                                            MotionEvent.ACTION_MOVE,
+                                                            lastCursorX, // Keep X locked to gaze or
+                                                            // original? Using gaze for
+                                                            // now as per previous
+                                                            touchScrollCurrentY,
+                                                            0
+                                                    )
+                                            moveEvent.source = InputDevice.SOURCE_TOUCHSCREEN
+                                            isSimulatingTouchEvent = true
+                                            try {
+                                                webView.dispatchTouchEvent(moveEvent)
+                                            } finally {
+                                                isSimulatingTouchEvent = false
+                                            }
+                                            moveEvent.recycle()
+
+                                            // Schedule ACTION_CANCEL to complete the gesture if
+                                            // scrolling stops. Using CANCEL prevents "clicks" on
+                                            // lift.
+                                            if (pendingTouchHandler == null) {
+                                                pendingTouchHandler =
+                                                        Handler(Looper.getMainLooper())
+                                            }
+                                            pendingTouchRunnable?.let {
+                                                pendingTouchHandler?.removeCallbacks(it)
+                                            }
+
+                                            pendingTouchRunnable = Runnable {
+                                                if (isTouchScrollActive) {
+                                                    val upTime = SystemClock.uptimeMillis()
+                                                    val cancelEvent =
+                                                            MotionEvent.obtain(
+                                                                    touchScrollDownTime,
+                                                                    upTime,
+                                                                    MotionEvent.ACTION_CANCEL,
+                                                                    lastCursorX,
+                                                                    touchScrollCurrentY,
+                                                                    0
+                                                            )
+                                                    cancelEvent.source =
+                                                            InputDevice.SOURCE_TOUCHSCREEN
+                                                    isSimulatingTouchEvent = true
+                                                    try {
+                                                        webView.dispatchTouchEvent(cancelEvent)
+                                                    } finally {
+                                                        isSimulatingTouchEvent = false
+                                                    }
+                                                    cancelEvent.recycle()
+                                                    isTouchScrollActive = false
+                                                    DebugLog.d(
+                                                            "ScrollMode",
+                                                            "Touch scroll gesture cancelled via timeout"
+                                                    )
+                                                }
+                                            }
+                                            pendingTouchHandler?.postDelayed(
+                                                    pendingTouchRunnable!!,
+                                                    150
+                                            )
+                                        }
                                     }
                                     return true
                                 }
@@ -594,7 +783,7 @@ class MainActivity :
                                 // val cursorGain = 0.45f // using class member cursorGain instead
                                 val dx = -distanceX * cursorGain
                                 val dy = -distanceY * cursorGain
-                                if (!isAnchored) {
+                                if (!isAnchored && !dualWebViewGroup.isInScrollMode()) {
                                     // Clamp to single eye dimensions (640x480), not full dual
                                     // display width
                                     val maxW = 640f
@@ -705,11 +894,29 @@ class MainActivity :
                                     return true // Consume the event so it doesn't propagate
                                 }
 
+                                // If this is part of a triple tap sequence (which just toggled
+                                // mode), ignore double tap
+                                if (isTripleTapInProgress) {
+                                    DebugLog.d(
+                                            "DoubleTapDebug",
+                                            "Double tap ignored - part of triple tap sequence"
+                                    )
+                                    return true
+                                }
+
                                 val isInScrollMode = dualWebViewGroup.isInScrollMode()
                                 DebugLog.d(
                                         "DoubleTapDebug",
                                         """onDoubleTap called. isProcessingDoubleTap: $isProcessingDoubleTap, isInScrollMode: $isInScrollMode"""
                                 )
+
+                                if (isInScrollMode) {
+                                    DebugLog.d(
+                                            "DoubleTapDebug",
+                                            "Double tap ignored because in scroll mode"
+                                    )
+                                    return true
+                                }
 
                                 synchronized(doubleTapLock) {
                                     // Safety check: Reset if flag has been stuck for too long
@@ -737,28 +944,57 @@ class MainActivity :
                                     lastDoubleTapStartTime = currentTime
                                     pendingDoubleTapAction = true
 
-                                    handler.postDelayed(
-                                            {
-                                                synchronized(doubleTapLock) {
-                                                    try {
-                                                        if (pendingDoubleTapAction) {
-                                                            DebugLog.d(
-                                                                    "DoubleTapDebug",
-                                                                    "Executing pending double tap action"
-                                                            )
-                                                            performDoubleTapBackNavigation()
-                                                        }
-                                                    } finally {
-                                                        tapCount = 0
-                                                        lastTapTime = 0L
-                                                        pendingDoubleTapAction = false
-                                                        isProcessingDoubleTap = false
-                                                        lastDoubleTapStartTime = 0L
-                                                    }
-                                                }
-                                            },
-                                            DOUBLE_TAP_CONFIRMATION_DELAY
+                                    // Calculate dynamic delay to ensure we wait until AFTER the
+                                    // triple tap window closes
+                                    val timeSinceFirstTap =
+                                            System.currentTimeMillis() - firstTapTime
+                                    val remainingTripleTapWindow =
+                                            TRIPLE_TAP_DURATION - timeSinceFirstTap
+
+                                    // Make sure we wait at least a small buffer after the window
+                                    // closes
+                                    // But cap the delay to avoid excessive waiting if the window is
+                                    // huge (though 800ms is reasonable)
+                                    val delay =
+                                            if (remainingTripleTapWindow > 0)
+                                                    remainingTripleTapWindow + 30
+                                            else DOUBLE_TAP_CONFIRMATION_DELAY
+
+                                    DebugLog.d(
+                                            "DoubleTapDebug",
+                                            "Scheduling double tap action. Delay: ${delay}ms (Window remaining: $remainingTripleTapWindow)"
                                     )
+
+                                    doubleTapRunnable = Runnable {
+                                        synchronized(doubleTapLock) {
+                                            try {
+                                                // Final check for triple tap
+                                                if (isTripleTapInProgress) {
+                                                    DebugLog.d(
+                                                            "DoubleTapDebug",
+                                                            "Aborting double tap action - triple tap in progress"
+                                                    )
+                                                    return@Runnable
+                                                }
+
+                                                if (pendingDoubleTapAction) {
+                                                    DebugLog.d(
+                                                            "DoubleTapDebug",
+                                                            "Executing pending double tap action"
+                                                    )
+                                                    performDoubleTapBackNavigation()
+                                                }
+                                            } finally {
+                                                // Note: Do NOT reset tapCount/lastTapTime here
+                                                pendingDoubleTapAction = false
+                                                isProcessingDoubleTap = false
+                                                lastDoubleTapStartTime = 0L
+                                                doubleTapRunnable = null
+                                            }
+                                        }
+                                    }
+
+                                    handler.postDelayed(doubleTapRunnable!!, delay)
                                 }
 
                                 return true
@@ -1038,9 +1274,6 @@ class MainActivity :
         cursorRightView.visibility = View.VISIBLE
         centerCursor(true)
 
-        resetScrollModeTimer()
-        DebugLog.d("ScrollModeDebug", "Initial scroll mode timer started")
-
         // Start in saved anchored mode state
         if (isAnchored) {
             rotationSensor?.let { sensor ->
@@ -1240,16 +1473,6 @@ class MainActivity :
 
         // Mask the screen
         dualWebViewGroup.maskScreen()
-    }
-
-    private fun resetScrollModeTimer() {
-        // Always clear any existing timer first
-        scrollModeHandler.removeCallbacks(scrollModeRunnable)
-
-        // Start timer if cursor is visible and keyboard isn't
-        if (isCursorVisible && !isKeyboardVisible) {
-            scrollModeHandler.postDelayed(scrollModeRunnable, SCROLL_MODE_TIMEOUT)
-        }
     }
 
     override fun onSendCharacterToLink(character: String) {
@@ -2582,6 +2805,11 @@ class MainActivity :
 
             val eventTime = SystemClock.uptimeMillis()
 
+            // Set simulation flag to true to prevent this event from being counted as a new gesture
+            // by the OnTouchListener (which would trigger onDown and inaccurate tap counts).
+            // It gets reset to false in the cleanup handler below (line 2842).
+            isSimulatingTouchEvent = true
+
             // DOWN event
             val motionEventDown =
                     MotionEvent.obtain(
@@ -2962,11 +3190,33 @@ class MainActivity :
     }
 
     override fun onWindowSwitched(webView: WebView) {
+        // Update reference
         this.webView = webView
 
-        // Re-attach touch listener to new WebView
-        this.webView.setOnTouchListener { _, event ->
-            // Replicated touch listener logic
+        // Ensure the correct touch listener is attached (though configureWebView likely did it)
+        attachTouchListener(webView)
+
+        // Persist the newly active window so reopen returns to the correct tab/page.
+
+        // Persist the newly active window so reopen returns to the correct tab/page.
+        persistActiveWebViewState("onWindowSwitched", webView)
+    }
+
+    private fun attachTouchListener(targetWebView: WebView) {
+        targetWebView.setOnTouchListener { _, event ->
+            // Allow simulated events to pass through immediately (used for scrolling)
+            // CRITICAL: Check this FIRST to prevent infinite loops where simulated events
+            // are fed back into gestureDetector, triggering more scrolls.
+            if (isSimulatingTouchEvent) {
+                return@setOnTouchListener false
+            }
+
+            // DO NOT call gestureDetector.onTouchEvent(event) here!
+            // It is already called in MainActivity.dispatchTouchEvent().
+            // Calling it again causes double-counting of taps (1 physical tap = 2 gesture taps).
+            // We just use the result stored in isGestureHandled.
+
+            // Logic to clear pending runnables on touch interaction
             if (event.action == MotionEvent.ACTION_DOWN ||
                             event.action == MotionEvent.ACTION_UP ||
                             event.action == MotionEvent.ACTION_CANCEL
@@ -2975,41 +3225,51 @@ class MainActivity :
                 pendingTouchRunnable = null
             }
 
-            if (isAnchored && isKeyboardVisible) {
-                return@setOnTouchListener false
-            }
+            // --- BLOCKING LOGIC START ---
 
-            if (isSimulatingTouchEvent) {
+            if (isAnchored && isKeyboardVisible) {
+                // Special case for anchored keyboard? (Original logic preserved)
                 return@setOnTouchListener false
             }
 
             if (isKeyboardVisible) {
+                // If keyboard is visible, block touches to WebView (prevent clicks behind keyboard)
                 return@setOnTouchListener true
             }
 
-            val handled = isGestureHandled
-
             if (dualWebViewGroup.isSettingsVisible()) {
+                // If settings are open, only block if cursor is visible?
+                // logic matches original: return isCursorVisible
                 return@setOnTouchListener isCursorVisible
             }
 
-            if (dualWebViewGroup.isInScrollMode() && isAnchored) {
-                return@setOnTouchListener false
-            }
-
-            if (isCursorVisible) {
+            if (dualWebViewGroup.isInScrollMode()) {
+                // SCROLL MODE ENFORCEMENT:
+                // Block ALL real touch events. The only way to interact is via
+                // simulated scroll events (caught by isSimulatingTouchEvent check above)
+                // or via gestures (caught by gestureDetector above).
                 return@setOnTouchListener true
             }
 
-            handled
-        }
+            if (isCursorVisible) {
+                // If cursor is visible, we are in "mouse mode" - block direct touches.
+                return@setOnTouchListener true
+            }
 
-        // Persist the newly active window so reopen returns to the correct tab/page.
-        persistActiveWebViewState("onWindowSwitched", webView)
+            // --- BLOCKING LOGIC END ---
+
+            // Otherwise, return handled state from GestureDetector
+            // If GestureDetector consumed it (e.g., tap, long press), we consume.
+            // If not, we fall through to false?
+            // Actually original code returned 'handled' which was 'isGestureHandled'
+            isGestureHandled
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView(webView: WebView) {
+        attachTouchListener(webView)
+
         // First check if speech recognition is available
         val speechRecognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         val speechRecognitionAvailable =
@@ -4233,13 +4493,14 @@ class MainActivity :
         // Higher slider values = LOWER factors = MORE smoothing
         // Lower slider values = HIGHER factors = LESS smoothing (more responsive)
 
-        // Quaternion SLERP: 0.20 (fast/left) to 0.02 (very smooth/right)
+        // Quaternion SLERP: 0.40 (fast/left) to 0.02 (very smooth/right)
         // Inverting: 100 - level gives us the inverse
+        // Range expanded to compensate for SENSOR_DELAY_UI timing
         val invertedLevel = 100 - smoothnessLevel
-        anchorSmoothingFactor = 0.02f + (invertedLevel / 100f) * 0.18f
+        anchorSmoothingFactor = 0.02f + (invertedLevel / 100f) * 0.38f
 
-        // Velocity smoothing: 0.30 (fast/left) to 0.05 (very smooth/right)
-        velocitySmoothing = 0.05f + (invertedLevel / 100f) * 0.25f
+        // Velocity smoothing: 0.55 (fast/left) to 0.05 (very smooth/right)
+        velocitySmoothing = 0.05f + (invertedLevel / 100f) * 0.50f
 
         DebugLog.d(
                 "SmoothnessDebug",
@@ -4404,6 +4665,8 @@ class MainActivity :
                             else -> !previouslyVisible
                         }
 
+                // Early exit if already in the desired state (but still reset isToggling in
+                // finally)
                 if (targetVisibility == previouslyVisible) {
                     return
                 }
@@ -4425,17 +4688,9 @@ class MainActivity :
                     cursorJustAppeared = true
                     // Block interactions briefly to prevent stale taps from firing as the cursor
                     // reappears.
-                    isSimulatingTouchEvent = true
-                    Handler(Looper.getMainLooper())
-                            .postDelayed(
-                                    {
-                                        cursorJustAppeared = false
-                                        isSimulatingTouchEvent = false
-                                    },
-                                    300
-                            )
-
-                    resetScrollModeTimer()
+                    // Note: removed isSimulatingTouchEvent = true as it causes OnTouchListener to
+                    // ALLOW events through
+                    Handler(Looper.getMainLooper()).postDelayed({ cursorJustAppeared = false }, 300)
                 } else {
                     lastKnownCursorX = lastCursorX
                     lastKnownCursorY = lastCursorY
@@ -4446,7 +4701,6 @@ class MainActivity :
                     lastKnownWebViewY = lastCursorY - webViewLocation[1]
 
                     webView.evaluateJavascript("window.toggleTouchEvents(false);", null)
-                    scrollModeHandler.removeCallbacks(scrollModeRunnable)
                 }
 
                 refreshCursor()
@@ -4538,9 +4792,7 @@ class MainActivity :
     }
 
     private fun handleUserInteraction() {
-        if (isCursorVisible && !isKeyboardVisible) {
-            resetScrollModeTimer()
-        }
+        if (isCursorVisible && !isKeyboardVisible) {}
     }
 
     override fun onBackspacePressed() {
