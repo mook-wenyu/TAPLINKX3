@@ -1782,6 +1782,26 @@ class MainActivity :
         }
     }
 
+    private fun isStreamingSite(url: String?): Boolean {
+        if (url == null) return false
+        val streamingDomains = listOf(
+            "netflix.com",
+            "disneyplus.com",
+            "hulu.com",
+            "primevideo.com",
+            "amazon.com/gp/video",
+            "max.com",
+            "peacocktv.com",
+            "apple.com/tv",
+            "tv.apple.com",
+            "tubitv.com",
+            "pluto.tv",
+            "paramountplus.com",
+            "discoveryplus.com"
+        )
+        return streamingDomains.any { url.contains(it, ignoreCase = true) }
+    }
+
     private fun initializeSpeechRecognition() {
         // Check if speech recognition is available
         val isAvailable = SpeechRecognizer.isRecognitionAvailable(this)
@@ -3420,14 +3440,14 @@ class MainActivity :
 
                             dualWebViewGroup.clearExternalScrollMetrics()
 
-                            // Netflix Fix: Force default User Agent to ensure Widevine CDM works
-                            val isNetflix = url?.contains("netflix.com") == true
-                            if (isNetflix) {
+                            // Streaming Fix: Force default User Agent to ensure Widevine CDM works
+                            val isStreaming = isStreamingSite(url)
+                            if (isStreaming) {
                                 if (view?.settings?.userAgentString != defaultUserAgent) {
                                     view?.settings?.userAgentString = defaultUserAgent
                                     DebugLog.d(
-                                            "NetflixFix",
-                                            "Switched to default User Agent for Netflix"
+                                            "StreamingFix",
+                                            "Switched to default User Agent for Streaming Site"
                                     )
                                 }
                             } else {
