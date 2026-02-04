@@ -285,9 +285,7 @@ Answer questions concisely and keep all responses human readable. You cannot con
 
             client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
-                    val errorBody = response.body?.string() ?: "no body"
-                    DebugLog.e("GroqInterface", "TTS request failed: ${response.code} - $errorBody")
-                    DebugLog.e("GroqInterface", "TTS request was: ${jsonBody}")
+                    DebugLog.e("GroqInterface", "TTS request failed: ${response.code}")
                     mainHandler.post {
                         Toast.makeText(context, "TTS failed: ${response.code}", Toast.LENGTH_SHORT)
                                 .show()
