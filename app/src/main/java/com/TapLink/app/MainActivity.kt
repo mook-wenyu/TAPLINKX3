@@ -1052,6 +1052,14 @@ class MainActivity :
                     }
                 }
 
+        // Set up the mic listener for the chat view
+        dualWebViewGroup.micListener =
+                object : ChatView.MicListener {
+                    override fun onMicrophonePressed() {
+                        this@MainActivity.onMicrophonePressed()
+                    }
+                }
+
         // Cursor views setup
         // Set up the cursor views directly in the main container
         cursorLeftView =
@@ -1143,8 +1151,7 @@ class MainActivity :
         // Enable storage + JS features required by modern web apps (auth/session state, etc.).
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
-        @Suppress("DEPRECATION")
-        run { webView.settings.databaseEnabled = true }
+        @Suppress("DEPRECATION") run { webView.settings.databaseEnabled = true }
 
         webView.webViewClient =
                 object : WebViewClient() {
@@ -1794,21 +1801,22 @@ class MainActivity :
 
     private fun isStreamingSite(url: String?): Boolean {
         if (url == null) return false
-        val streamingDomains = listOf(
-            "netflix.com",
-            "disneyplus.com",
-            "hulu.com",
-            "primevideo.com",
-            "amazon.com/gp/video",
-            "max.com",
-            "peacocktv.com",
-            "apple.com/tv",
-            "tv.apple.com",
-            "tubitv.com",
-            "pluto.tv",
-            "paramountplus.com",
-            "discoveryplus.com"
-        )
+        val streamingDomains =
+                listOf(
+                        "netflix.com",
+                        "disneyplus.com",
+                        "hulu.com",
+                        "primevideo.com",
+                        "amazon.com/gp/video",
+                        "max.com",
+                        "peacocktv.com",
+                        "apple.com/tv",
+                        "tv.apple.com",
+                        "tubitv.com",
+                        "pluto.tv",
+                        "paramountplus.com",
+                        "discoveryplus.com"
+                )
         return streamingDomains.any { url.contains(it, ignoreCase = true) }
     }
 
@@ -2207,9 +2215,15 @@ class MainActivity :
                                 override fun onTranscriptionResult(text: String) {
                                     DebugLog.d("SpeechRecognition", "Groq result: $text")
                                     runOnUiThread {
-                                        handleVoiceResult(text)
+                                        // If chat is visible, insert text there
+                                        if (dualWebViewGroup.isChatVisible()) {
+                                            dualWebViewGroup.insertVoiceToChatInput(text)
+                                        } else {
+                                            handleVoiceResult(text)
+                                        }
                                         dualWebViewGroup.showToast("Success")
                                         keyboardView?.setMicActive(false)
+                                        dualWebViewGroup.setChatMicActive(false)
                                     }
                                 }
 
@@ -2219,6 +2233,7 @@ class MainActivity :
                                         audioManager?.setParameters("audio_source_record=off")
                                         dualWebViewGroup.showToast("Voice Error: $message")
                                         keyboardView?.setMicActive(false)
+                                        dualWebViewGroup.setChatMicActive(false)
                                         if (message.contains("No API Key")) {
                                             showGroqKeyDialog()
                                         }
@@ -2230,6 +2245,7 @@ class MainActivity :
                                     runOnUiThread {
                                         isListeningForSpeech = true
                                         keyboardView?.setMicActive(true)
+                                        dualWebViewGroup.setChatMicActive(true)
                                     }
                                 }
 
@@ -3632,11 +3648,12 @@ class MainActivity :
                                     dualWebViewGroup.showConfirmDialog(
                                             "The web page crashed. Reload?",
                                             { view?.reload() },
-                                            { /* Do nothing */ }
+                                            { /* Do nothing */}
                                     )
                                 } else {
                                     DebugLog.e("WebView", "Render process killed by system (OOM).")
-                                    // If system killed it, we can just return true and let the OS handle it,
+                                    // If system killed it, we can just return true and let the OS
+                                    // handle it,
                                     // or offer a reload.
                                 }
                             }

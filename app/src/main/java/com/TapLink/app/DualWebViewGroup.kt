@@ -234,7 +234,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private var isBookmarkEditing = false
 
     private lateinit var mobileUserAgent: String
-    private val desktopUserAgent: String = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+    private val desktopUserAgent: String =
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
 
     private val verticalScrollFraction = 0.25f // Scroll vertically by 25% of the viewport per tap
 
@@ -361,6 +362,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             }
         }
 
+    var micListener: ChatView.MicListener? = null
+        set(value) {
+            field = value
+            if (::chatView.isInitialized) {
+                chatView.micListener = value
+            }
+        }
+
     private var navButtons: Map<String, NavButton>
 
     var listener: DualWebViewGroupListener? = null
@@ -376,6 +385,18 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     fun isActiveWebView(webView: WebView): Boolean {
         return this.webView == webView
+    }
+
+    fun setChatMicActive(active: Boolean) {
+        if (::chatView.isInitialized) {
+            chatView.setMicActive(active)
+        }
+    }
+
+    fun insertVoiceToChatInput(text: String) {
+        if (::chatView.isInitialized) {
+            chatView.insertVoiceText(text)
+        }
     }
 
     fun pauseBackgroundMedia(sourceWebView: WebView) {
@@ -3208,8 +3229,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             val settings = this.settings
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
-            @Suppress("DEPRECATION")
-            run { settings.databaseEnabled = true }
+            @Suppress("DEPRECATION") run { settings.databaseEnabled = true }
             settings.useWideViewPort = true
             settings.loadWithOverviewMode = true
             settings.setSupportZoom(true)

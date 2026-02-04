@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>TapLink AI</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
             --bg: #0b0f1a;
@@ -114,6 +115,36 @@
         }
 
         /* Input Area */
+        .chat-input-area button#micBtn {
+            background: linear-gradient(145deg, #1e3a5f, #264b70);
+            color: var(--text);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 16px;
+            font-size: 12px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chat-input-area button#micBtn.active {
+            background: linear-gradient(145deg, #ff4444, #cc3333);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
         .chat-input-area {
             display: flex;
             gap: 10px;
@@ -167,11 +198,11 @@
             transition: transform 0.2s ease;
         }
 
-        .tts-toggle input:checked + .toggle-track {
+        .tts-toggle input:checked+.toggle-track {
             background: rgba(105, 240, 174, 0.8);
         }
 
-        .tts-toggle input:checked + .toggle-track::after {
+        .tts-toggle input:checked+.toggle-track::after {
             transform: translateX(16px);
         }
 
@@ -283,6 +314,7 @@
 
     <div class="chat-input-area">
         <input id="chatInput" type="text" placeholder="Ask anything..." autocomplete="off" />
+        <button id="micBtn" type="button" aria-label="Voice input">Mic</button>
         <button id="summarizeBtn" type="button" aria-label="Summarize this webpage">Summarize</button>
         <button id="sendBtn" type="button">➤</button>
     </div>
@@ -292,14 +324,43 @@
         const chatInput = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendBtn');
         const summarizeBtn = document.getElementById('summarizeBtn');
+        const micBtn = document.getElementById('micBtn');
         const ttsToggle = document.getElementById('ttsToggle');
 
         let messages = [];
         let ttsEnabled = false;
         let activeTtsAudio = null;
+        let isMicActive = false;
 
         // Auto-scroll to bottom on load
         chatHistory.scrollTop = chatHistory.scrollHeight;
+
+        // Mic button handler
+        function toggleMic() {
+            if (window.ChatInputBridge && window.ChatInputBridge.onMicrophonePressed) {
+                window.ChatInputBridge.onMicrophonePressed();
+            } else {
+                console.warn("ChatInputBridge.onMicrophonePressed not found");
+            }
+        }
+
+        // Called by native code to set mic active state
+        window.setMicActive = function (active) {
+            isMicActive = active;
+            if (active) {
+                micBtn.classList.add('active');
+            } else {
+                micBtn.classList.remove('active');
+            }
+        };
+
+        // Called by native code to insert transcribed text
+        window.insertVoiceText = function (text) {
+            if (text) {
+                chatInput.value = (chatInput.value || '') + text;
+                chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        };
 
         function requestTts(text) {
             if (!ttsEnabled) return;
@@ -359,7 +420,32 @@
                 appendMessage('error', text);
             } else {
                 appendMessage('assistant', text);
-                requestTts(text);
+                // TTS is now handled via receiveGroqResponseWithTts when enabled
+            }
+        };
+
+        window.receiveGroqResponseWithTts = function (text, base64Audio, mimeType) {
+            const loading = chatHistory.querySelector('.msg.loading');
+            if (loading) loading.remove();
+
+            if (text.startsWith("Error:")) {
+                appendMessage('error', text);
+                return;
+            }
+
+            // Display text
+            appendMessage('assistant', text);
+
+            // Play audio if provided
+            if (base64Audio) {
+                const audioSrc = `data:${mimeType || 'audio/mpeg'};base64,${base64Audio}`;
+                if (activeTtsAudio) {
+                    activeTtsAudio.pause();
+                    activeTtsAudio = null;
+                }
+                const audio = new Audio(audioSrc);
+                activeTtsAudio = audio;
+                audio.play().catch(err => console.warn('TTS playback failed', err));
             }
         };
 
@@ -377,7 +463,7 @@
             // Call Native Bridge
             showLoading();
             if (window.GroqBridge && window.GroqBridge.chatWithGroq) {
-                window.GroqBridge.chatWithGroq(text, JSON.stringify(messages.slice(0, -1)));
+                window.GroqBridge.chatWithGroq(text, JSON.stringify(messages.slice(0, -1)), ttsEnabled);
             } else {
                 console.warn("GroqBridge not found");
                 setTimeout(() => {
@@ -418,6 +504,7 @@
 
         sendBtn.addEventListener('click', sendChat);
         summarizeBtn.addEventListener('click', sendSummary);
+        micBtn.addEventListener('click', toggleMic);
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendChat();
         });

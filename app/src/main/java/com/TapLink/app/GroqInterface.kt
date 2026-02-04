@@ -4,10 +4,11 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.os.Handler
 import android.os.Looper
+import android.util.Base64
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
+import android.widget.Toast
 import androidx.annotation.Keep
-import android.util.Base64
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
@@ -57,8 +58,8 @@ class GroqInterface(private val context: Context, private val webView: WebView) 
 
     @JavascriptInterface
     @Keep
-    fun chatWithGroq(message: String, historyJson: String) {
-        DebugLog.d("GroqInterface", "chatWithGroq called: $message")
+    fun chatWithGroq(message: String, historyJson: String, ttsEnabled: Boolean) {
+        DebugLog.d("GroqInterface", "chatWithGroq called: $message, ttsEnabled: $ttsEnabled")
         Thread {
                     try {
                         val prefs =
@@ -87,7 +88,7 @@ class GroqInterface(private val context: Context, private val webView: WebView) 
 The documentation for the TapLink X3 web browser can be found here: https://github.com/informalTechCode/TAPLINKX3/blob/main/docs/USER_GUIDE.md. Refer to these documents for any questions about the 
 Information about the glasses it lives on can be found here: https://www.rayneo.com/products/x3-pro-ai-display-glasses
 The creator of the TapLink X3 browser is Informal Tech. Tech-tuber that makes awesome tech videos on YouTube. He is found at youtube.com/@informal-tech.
-Answer questions concisely and keep all responses human readable. Keep replies concise."""
+Answer questions concisely and keep all responses human readable. You cannot control features of the glasses. Keep replies concise."""
 
                         val activity = findMainActivity(context)
                         val location = activity?.getLastLocation()
@@ -147,7 +148,18 @@ Answer questions concisely and keep all responses human readable. Keep replies c
                                             choices.getJSONObject(0)
                                                     .getJSONObject("message")
                                                     .getString("content")
-                                    postResponse(content)
+
+                                    // If TTS is enabled, fetch audio before responding
+                                    if (ttsEnabled) {
+                                        val ttsAudio = fetchTtsAudio(content, apiKey)
+                                        postResponseWithTts(
+                                                content,
+                                                ttsAudio?.first,
+                                                ttsAudio?.second
+                                        )
+                                    } else {
+                                        postResponse(content)
+                                    }
                                 } else {
                                     postResponse("Error: No response from AI.")
                                 }
@@ -178,10 +190,10 @@ Answer questions concisely and keep all responses human readable. Keep replies c
                         }
 
                         val jsonBody = JSONObject()
-                        jsonBody.put("model", "orpheus")
+                        jsonBody.put("model", "canopylabs/orpheus-v1-english")
                         jsonBody.put("input", text)
-                        jsonBody.put("voice", "Orpheus")
-                        jsonBody.put("response_format", "mp3")
+                        jsonBody.put("voice", "hannah")
+                        jsonBody.put("response_format", "wav")
 
                         val requestBody =
                                 jsonBody.toString()
@@ -204,9 +216,8 @@ Answer questions concisely and keep all responses human readable. Keep replies c
 
                             val bytes = response.body?.bytes()
                             if (bytes != null && bytes.isNotEmpty()) {
-                                val base64Audio =
-                                        Base64.encodeToString(bytes, Base64.NO_WRAP)
-                                postTtsAudio(base64Audio, "audio/mpeg")
+                                val base64Audio = Base64.encodeToString(bytes, Base64.NO_WRAP)
+                                postTtsAudio(base64Audio, "audio/wav")
                             } else {
                                 postTtsError("Error: Empty TTS response body.")
                             }
@@ -246,6 +257,75 @@ Answer questions concisely and keep all responses human readable. Keep replies c
         mainHandler.post {
             val quotedMessage = JSONObject.quote(message)
             webView.evaluateJavascript("receiveGroqTtsError($quotedMessage)", null)
+        }
+    }
+
+    /**
+     * Fetches TTS audio synchronously. Must be called from a background thread. Returns
+     * Pair(base64Audio, mimeType) or null on failure.
+     */
+    private fun fetchTtsAudio(text: String, apiKey: String): Pair<String, String>? {
+        return try {
+            val jsonBody = JSONObject()
+            jsonBody.put("model", "canopylabs/orpheus-v1-english")
+            jsonBody.put("input", text)
+            jsonBody.put("voice", "hannah")
+            jsonBody.put("response_format", "wav")
+
+            val requestBody =
+                    jsonBody.toString()
+                            .toRequestBody("application/json; charset=utf-8".toMediaType())
+
+            val request =
+                    Request.Builder()
+                            .url("https://api.groq.com/openai/v1/audio/speech")
+                            .addHeader("Authorization", "Bearer $apiKey")
+                            .post(requestBody)
+                            .build()
+
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    val errorBody = response.body?.string() ?: "no body"
+                    DebugLog.e("GroqInterface", "TTS request failed: ${response.code} - $errorBody")
+                    DebugLog.e("GroqInterface", "TTS request was: ${jsonBody}")
+                    mainHandler.post {
+                        Toast.makeText(context, "TTS failed: ${response.code}", Toast.LENGTH_SHORT)
+                                .show()
+                    }
+                    return null
+                }
+
+                val bytes = response.body?.bytes()
+                if (bytes != null && bytes.isNotEmpty()) {
+                    val base64Audio = Base64.encodeToString(bytes, Base64.NO_WRAP)
+                    Pair(base64Audio, "audio/wav")
+                } else {
+                    DebugLog.e("GroqInterface", "TTS response body empty")
+                    mainHandler.post {
+                        Toast.makeText(context, "TTS failed: Empty response", Toast.LENGTH_SHORT)
+                                .show()
+                    }
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            DebugLog.e("GroqInterface", "TTS fetch failed", e)
+            mainHandler.post {
+                Toast.makeText(context, "TTS failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+            null
+        }
+    }
+
+    private fun postResponseWithTts(text: String, base64Audio: String?, mimeType: String?) {
+        mainHandler.post {
+            val escapedText = text.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n")
+            val audioArg = if (base64Audio != null) JSONObject.quote(base64Audio) else "null"
+            val mimeArg = if (mimeType != null) JSONObject.quote(mimeType) else "null"
+            webView.evaluateJavascript(
+                    "receiveGroqResponseWithTts('$escapedText', $audioArg, $mimeArg)",
+                    null
+            )
         }
     }
 

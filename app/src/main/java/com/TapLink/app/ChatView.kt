@@ -55,11 +55,21 @@ class ChatView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
             }
 
     var keyboardListener: DualWebViewGroup.KeyboardListener? = null
+    var micListener: MicListener? = null
+
+    interface MicListener {
+        fun onMicrophonePressed()
+    }
 
     private inner class ChatInputBridge {
         @JavascriptInterface
         fun onInputFocus() {
             post { keyboardListener?.onShowKeyboard() }
+        }
+
+        @JavascriptInterface
+        fun onMicrophonePressed() {
+            post { micListener?.onMicrophonePressed() }
         }
     }
 
@@ -274,13 +284,11 @@ class ChatView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         webView.evaluateJavascript(
                 """
             (function() {
-                var el = document.activeElement;
+                var el = document.getElementById('chatInput');
                 if (!el) return;
-                var isInput = el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable;
-                if (!isInput) return;
                 var value = el.value || '';
-                var start = el.selectionStart || 0;
-                var end = el.selectionEnd || 0;
+                var start = el.selectionStart || value.length;
+                var end = el.selectionEnd || value.length;
                 var insertText = ${JSONObject.quote(text)};
                 el.value = value.slice(0, start) + insertText + value.slice(end);
                 if (el.setSelectionRange) {
@@ -298,10 +306,8 @@ class ChatView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         webView.evaluateJavascript(
                 """
             (function() {
-                var el = document.activeElement;
+                var el = document.getElementById('chatInput');
                 if (!el) return;
-                var isInput = el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable;
-                if (!isInput) return;
                 var start = el.selectionStart || 0;
                 var end = el.selectionEnd || 0;
                 var value = el.value || '';
@@ -345,6 +351,18 @@ class ChatView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 el.dispatchEvent(event);
             })();
         """.trimIndent(),
+                null
+        )
+    }
+
+    fun setMicActive(active: Boolean) {
+        webView.evaluateJavascript("window.setMicActive && window.setMicActive($active);", null)
+    }
+
+    fun insertVoiceText(text: String) {
+        val escapedText = JSONObject.quote(text)
+        webView.evaluateJavascript(
+                "window.insertVoiceText && window.insertVoiceText($escapedText);",
                 null
         )
     }
