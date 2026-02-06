@@ -18,10 +18,6 @@ import org.json.JSONObject
 class ChatView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
         LinearLayout(context, attrs) {
 
-    companion object {
-        private const val TAG = "ChatView"
-    }
-
     private val titleText =
             TextView(context).apply {
                 text = "TapLink AI"
@@ -196,7 +192,6 @@ class ChatView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     }
 
     private var lastWebHoverAt = 0L
-    private var lastHoverId: String? = null
 
     private fun updateWebHover(x: Float, y: Float, isInside: Boolean) {
         val now = android.os.SystemClock.uptimeMillis()
@@ -231,26 +226,13 @@ class ChatView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 return '';
             })();
         """.trimIndent(),
-                { result ->
-                    val trimmed = result?.trim('"')
-                    lastHoverId = if (trimmed.isNullOrBlank()) null else trimmed
-                }
+                null
         )
     }
 
     fun clearHover() {
         closeButton.isHovered = false
-    }
-
-    // Pass touch events to WebView if using cursor simulation
-    fun dispatchTouchEventToWebView(x: Float, y: Float) {
-        // Transform coords relative to WebView
-        val webViewX = x - webView.left
-        val webViewY = y - webView.top
-
-        // TODO: Implement proper event dispatch if needed.
-        // For now, let's rely on standard touch propagation if the user taps directly.
-        // But for cursor mode, we might need dispatchTouchEvent.
+        updateWebHover(-1f, -1f, false)
     }
 
     private fun dispatchTapToWebView(localX: Float, localY: Float) {
