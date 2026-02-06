@@ -972,7 +972,6 @@
     const openQrScanner = document.getElementById('openQrScanner');
     const closeQrScanner = document.getElementById('closeQrScanner');
     const qrPage = document.getElementById('qrPage');
-    const qrVideo = document.getElementById('qrVideo');
     const qrResult = document.getElementById('qrResult');
     const linkModal = document.getElementById('linkModal');
     const linkForm = document.getElementById('linkForm');
@@ -986,9 +985,23 @@
     let isEditing = false;
     let editingKey = null;
     let modalOpenTime = 0;
-    let qrStream = null;
-    let qrScanner = null;
-    let qrAnimationFrame = null;
+    let inputGuardUntil = 0;
+
+    function armInputGuard(durationMs = 400) {
+      inputGuardUntil = Math.max(inputGuardUntil, Date.now() + durationMs);
+    }
+
+    ['pointerdown', 'pointerup', 'click', 'touchend'].forEach((type) => {
+      document.addEventListener(type, (event) => {
+        if (Date.now() < inputGuardUntil) {
+          event.preventDefault();
+          event.stopPropagation();
+          if (typeof event.stopImmediatePropagation === 'function') {
+            event.stopImmediatePropagation();
+          }
+        }
+      }, true);
+    });
 
     const specialIcons = {
       whatsapp: 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 256 256%22 width=%2220%22 height=%2220%22><path fill=%22%2325D366%22 d=%22M128 0a128 128 0 0 0-110 190L8 248l60-9A128 128 0 1 0 128 0Z"/><path fill=%22%23fff%22 d=%22M193 178c-9 4-21 9-34 5c-30-9-77-48-91-83c-7-17 2-31 7-36c4-4 9-5 12-5l8 1c3 1 6 9 7 12s5 12 5 12s1 3 0 5c-1 3-7 7-7 9s-1 3 1 6a142 142 0 0 0 25 30c18 16 31 21 35 22s5 0 7-2s8-10 10-13s5-3 8-2l20 9c3 1 5 3 5 5s-9 13-18 19Z"/></svg>'
@@ -1083,6 +1096,7 @@
         if (now - lastActivate < 350) { return; }
         lastActivate = now;
         event.preventDefault();
+        event.stopPropagation();
         handler(event);
       }
       button.addEventListener('click', activate);
@@ -1109,6 +1123,11 @@
     bindImmediate(openQrScanner, () => openQrPage());
     bindActivate(closeQrScanner, () => closeQrPage());
     bindActivate(cancelLink, () => closeModal());
+    ['pointerdown', 'pointerup', 'click', 'touchstart', 'touchend'].forEach((type) => {
+      qrPage.addEventListener(type, (event) => {
+        event.stopPropagation();
+      }, true);
+    });
     linkModal.addEventListener('click', (e) => { if (e.target === linkModal && Date.now() - modalOpenTime > 200) closeModal(); });
     [linkName, linkUrl, linkGroup].forEach((el) => {
       el.addEventListener('pointerup', () => el.focus({ preventScroll: true }));
@@ -1212,73 +1231,39 @@
       qrResult.textContent = `Scanned: ${text}`;
       const targetUrl = parseScannedUrl(text);
       if (targetUrl) {
-        stopQrScanner();
+        closeQrPage();
         window.location.href = targetUrl;
       }
     }
 
-    async function openQrPage() {
+    function openQrPage() {
       qrPage.classList.remove('hidden');
       qrPage.setAttribute('aria-hidden', 'false');
-      qrResult.textContent = 'Starting camera...';
-      try {
-        await startQrScanner();
-      } catch (error) {
-        qrResult.textContent = `Unable to start scanner: ${error?.message || error}`;
-      }
+      qrResult.textContent = 'Opening native scanner...';
+      startQrScanner();
     }
 
     function closeQrPage() {
-      stopQrScanner();
+      armInputGuard(450);
       qrPage.classList.add('hidden');
       qrPage.setAttribute('aria-hidden', 'true');
     }
 
-    async function startQrScanner() {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Camera API is not available in this WebView.');
+    function startQrScanner() {
+      if (!window.AndroidInterface || typeof window.AndroidInterface.startNativeQrScanner !== 'function') {
+        qrResult.textContent = 'Native scanner bridge is unavailable.';
+        return;
       }
-      qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-      qrVideo.srcObject = qrStream;
-      await qrVideo.play();
-
-      if (window.BarcodeDetector) {
-        qrScanner = new BarcodeDetector({ formats: ['qr_code'] });
-        qrResult.textContent = 'Scanning for QR code...';
-        scanQrFrame();
-      } else {
-        qrResult.textContent = 'Scanner not supported on this device. QR camera preview is active, but decoding is unavailable.';
-      }
+      window.AndroidInterface.startNativeQrScanner();
     }
 
-    function scanQrFrame() {
-      qrAnimationFrame = requestAnimationFrame(scanQrFrame);
-      if (!qrScanner || qrVideo.readyState < 2) return;
-      qrScanner.detect(qrVideo)
-        .then(codes => {
-          if (!codes || !codes.length) return;
-          const value = codes[0].rawValue;
-          if (value) {
-            onQrDetected(value);
-          }
-        })
-        .catch(() => { });
-    }
+    window.__taplinkOnNativeQrResult = function (value) {
+      onQrDetected(value);
+    };
 
-    function stopQrScanner() {
-      if (qrAnimationFrame !== null) {
-        cancelAnimationFrame(qrAnimationFrame);
-        qrAnimationFrame = null;
-      }
-      qrScanner = null;
-      if (qrVideo) {
-        qrVideo.pause();
-        qrVideo.srcObject = null;
-      }
-      if (qrStream) {
-        qrStream.getTracks().forEach(track => track.stop());
-        qrStream = null;
-      }
+    window.__taplinkOnNativeQrError = function (message) {
+      const text = String(message || 'Scan cancelled.');
+      qrResult.textContent = text;
     }
 
     function addSection(title, cls) {
