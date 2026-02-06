@@ -673,6 +673,45 @@
       --sec-glow: #7aa6ff;
     }
 
+    .qr-page {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .96);
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      gap: 10px;
+      box-sizing: border-box;
+    }
+
+    .qr-page.hidden {
+      display: none;
+    }
+
+    .qr-video-wrap {
+      flex: 1;
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: 14px;
+      overflow: hidden;
+      background: #111;
+      min-height: 200px;
+    }
+
+    .qr-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #000;
+    }
+
+    .qr-result {
+      min-height: 22px;
+      font-size: 13px;
+      color: var(--text);
+      word-break: break-word;
+    }
+
     [data-theme="dark"] {
       --bg: #000000;
       --bg-2: #000000;
@@ -708,6 +747,7 @@
       <strong style="color:var(--text)">TapLinkX3 Dashboard</strong>
       <div style="flex:1"></div>
       <div class="topbar-actions">
+        <button class="btn" id="openQrScanner" type="button">QR Scanner</button>
         <button class="btn" id="editToggle" type="button">Edit Links</button>
         <button class="btn" id="addLink" type="button">Add Link</button>
 
@@ -745,6 +785,18 @@
         <button class="btn" type="submit" form="linkForm" id="saveLink">Save</button>
       </div>
     </div>
+  </div>
+
+  <div id="qrPage" class="qr-page hidden" aria-hidden="true">
+    <div class="topbar">
+      <strong>QR Scanner</strong>
+      <div style="flex:1"></div>
+      <button class="btn" id="closeQrScanner" type="button">Back</button>
+    </div>
+    <div class="qr-video-wrap">
+      <video id="qrVideo" class="qr-video" autoplay playsinline muted></video>
+    </div>
+    <div id="qrResult" class="qr-result">Point camera at a QR code.</div>
   </div>
 
   <script>
@@ -917,6 +969,11 @@
     const search = document.getElementById('appSearch');
     const editToggle = document.getElementById('editToggle');
     const addLink = document.getElementById('addLink');
+    const openQrScanner = document.getElementById('openQrScanner');
+    const closeQrScanner = document.getElementById('closeQrScanner');
+    const qrPage = document.getElementById('qrPage');
+    const qrVideo = document.getElementById('qrVideo');
+    const qrResult = document.getElementById('qrResult');
     const linkModal = document.getElementById('linkModal');
     const linkForm = document.getElementById('linkForm');
     const linkName = document.getElementById('linkName');
@@ -929,6 +986,9 @@
     let isEditing = false;
     let editingKey = null;
     let modalOpenTime = 0;
+    let qrStream = null;
+    let qrScanner = null;
+    let qrAnimationFrame = null;
 
     const specialIcons = {
       whatsapp: 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 256 256%22 width=%2220%22 height=%2220%22><path fill=%22%2325D366%22 d=%22M128 0a128 128 0 0 0-110 190L8 248l60-9A128 128 0 1 0 128 0Z"/><path fill=%22%23fff%22 d=%22M193 178c-9 4-21 9-34 5c-30-9-77-48-91-83c-7-17 2-31 7-36c4-4 9-5 12-5l8 1c3 1 6 9 7 12s5 12 5 12s1 3 0 5c-1 3-7 7-7 9s-1 3 1 6a142 142 0 0 0 25 30c18 16 31 21 35 22s5 0 7-2s8-10 10-13s5-3 8-2l20 9c3 1 5 3 5 5s-9 13-18 19Z"/></svg>'
@@ -1046,6 +1106,8 @@
 
     bindImmediate(editToggle, () => setEditingMode(!isEditing));
     bindImmediate(addLink, () => openModal('add'));
+    bindImmediate(openQrScanner, () => openQrPage());
+    bindActivate(closeQrScanner, () => closeQrPage());
     bindActivate(cancelLink, () => closeModal());
     linkModal.addEventListener('click', (e) => { if (e.target === linkModal && Date.now() - modalOpenTime > 200) closeModal(); });
     [linkName, linkUrl, linkGroup].forEach((el) => {
@@ -1128,6 +1190,95 @@
         window.location.href = meta.url;
       });
       return app;
+    }
+
+    function parseScannedUrl(value) {
+      if (!value) return null;
+      const raw = String(value).trim();
+      if (!raw) return null;
+      const normalized = /^[a-z][a-z0-9+.-]*:\/\//i.test(raw) ? raw : `https://${raw}`;
+      try {
+        const parsed = new URL(normalized);
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+          return parsed.href;
+        }
+      } catch (e) { }
+      return null;
+    }
+
+    function onQrDetected(rawValue) {
+      const text = String(rawValue || '').trim();
+      if (!text) return;
+      qrResult.textContent = `Scanned: ${text}`;
+      const targetUrl = parseScannedUrl(text);
+      if (targetUrl) {
+        stopQrScanner();
+        window.location.href = targetUrl;
+      }
+    }
+
+    async function openQrPage() {
+      qrPage.classList.remove('hidden');
+      qrPage.setAttribute('aria-hidden', 'false');
+      qrResult.textContent = 'Starting camera...';
+      try {
+        await startQrScanner();
+      } catch (error) {
+        qrResult.textContent = `Unable to start scanner: ${error?.message || error}`;
+      }
+    }
+
+    function closeQrPage() {
+      stopQrScanner();
+      qrPage.classList.add('hidden');
+      qrPage.setAttribute('aria-hidden', 'true');
+    }
+
+    async function startQrScanner() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera API is not available in this WebView.');
+      }
+      qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+      qrVideo.srcObject = qrStream;
+      await qrVideo.play();
+
+      if (window.BarcodeDetector) {
+        qrScanner = new BarcodeDetector({ formats: ['qr_code'] });
+        qrResult.textContent = 'Scanning for QR code...';
+        scanQrFrame();
+      } else {
+        qrResult.textContent = 'Scanner not supported on this device. QR camera preview is active, but decoding is unavailable.';
+      }
+    }
+
+    function scanQrFrame() {
+      qrAnimationFrame = requestAnimationFrame(scanQrFrame);
+      if (!qrScanner || qrVideo.readyState < 2) return;
+      qrScanner.detect(qrVideo)
+        .then(codes => {
+          if (!codes || !codes.length) return;
+          const value = codes[0].rawValue;
+          if (value) {
+            onQrDetected(value);
+          }
+        })
+        .catch(() => { });
+    }
+
+    function stopQrScanner() {
+      if (qrAnimationFrame !== null) {
+        cancelAnimationFrame(qrAnimationFrame);
+        qrAnimationFrame = null;
+      }
+      qrScanner = null;
+      if (qrVideo) {
+        qrVideo.pause();
+        qrVideo.srcObject = null;
+      }
+      if (qrStream) {
+        qrStream.getTracks().forEach(track => track.stop());
+        qrStream = null;
+      }
     }
 
     function addSection(title, cls) {
