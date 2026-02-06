@@ -234,8 +234,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private var isBookmarkEditing = false
 
     private lateinit var mobileUserAgent: String
-    private val desktopUserAgent: String =
-            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+    private var desktopUserAgent: String = ""
 
     private val verticalScrollFraction = 0.25f // Scroll vertically by 25% of the viewport per tap
 
@@ -1996,6 +1995,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         webView = initialWebView
         configureWebView(webView) // Local basic config
         mobileUserAgent = webView.settings.userAgentString
+        desktopUserAgent = buildDesktopUserAgentFromMobile(mobileUserAgent)
 
         // CRITICAL FIX: Do NOT add the initial webview to the container or windows list yet.
         // This prevents the "Dashboard flash" on startup.
@@ -4738,10 +4738,29 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     fun setMobileUserAgent(ua: String) {
         mobileUserAgent = ua
+        desktopUserAgent = buildDesktopUserAgentFromMobile(ua)
     }
 
     fun getDesktopUserAgent(): String {
         return desktopUserAgent
+    }
+
+    private fun buildDesktopUserAgentFromMobile(mobileUa: String): String {
+        val chromeVersion = Regex("""Chrome/([0-9.]+)""").find(mobileUa)?.groupValues?.get(1)
+        if (!chromeVersion.isNullOrBlank()) {
+            // Use real runtime Chrome version so desktop mode is plausible, not hardcoded/fake.
+            return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                    "AppleWebKit/537.36 (KHTML, like Gecko) " +
+                    "Chrome/$chromeVersion Safari/537.36"
+        }
+
+        // Fallback: keep runtime UA and strip obvious embedded/mobile markers.
+        return mobileUa
+                .replace(Regex(""";\s*wv\b"""), "")
+                .replace(Regex("""\sVersion/\d+(\.\d+)*"""), "")
+                .replace(Regex("""\sMobile\b"""), "")
+                .replace(Regex("""\s{2,}"""), " ")
+                .trim()
     }
 
     fun updateBrowsingMode(isDesktop: Boolean) {
@@ -5062,6 +5081,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         listOf(
                                 R.id.volumeSeekBar,
                                 R.id.brightnessSeekBar,
+                                R.id.btnToggleForceDark,
                                 R.id.smoothnessSeekBar,
                                 R.id.screenSizeSeekBar,
                                 R.id.btnResetScreenSize,
@@ -5386,6 +5406,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         listOf(
                                 R.id.volumeSeekBar,
                                 R.id.brightnessSeekBar,
+                                R.id.btnToggleForceDark,
                                 R.id.smoothnessSeekBar,
                                 R.id.screenSizeSeekBar,
                                 R.id.btnResetScreenSize,
@@ -6114,6 +6135,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 val currentBrightness =
                         (context as? Activity)?.window?.attributes?.screenBrightness ?: 0.5f
                 brightnessSeekBar?.progress = (currentBrightness * 100).toInt()
+                val forceDarkButton = menu.findViewById<Button>(R.id.btnToggleForceDark)
+                val forceDarkEnabled =
+                        context.getSharedPreferences("TapLinkPrefs", Context.MODE_PRIVATE)
+                                .getBoolean("forceDarkWebEnabled", true)
+                forceDarkButton?.text = if (forceDarkEnabled) "Force Dark: On" else "Force Dark: Off"
 
                 // Initialize smoothness seekbar from saved preference
                 val smoothnessSeekBar = menu.findViewById<SeekBar>(R.id.smoothnessSeekBar)
@@ -6161,9 +6187,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 // Initialize color buttons with visual background indicators
                 // Initialize color wheel with saved color
                 menu.findViewById<ColorWheelView>(R.id.colorWheelView)?.apply {
-                    val savedTextColor =
-                            context.getSharedPreferences("TapLinkPrefs", Context.MODE_PRIVATE)
-                                    .getString("webTextColor", null)
+                    val prefs = context.getSharedPreferences("TapLinkPrefs", Context.MODE_PRIVATE)
+                    val savedTextColor = getEffectiveWebTextColor(prefs)
                     try {
                         setColor(Color.parseColor(savedTextColor))
                     } catch (e: Exception) {
@@ -6172,9 +6197,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 }
 
                 // Apply saved font settings
-                val savedTextColor =
-                        context.getSharedPreferences("TapLinkPrefs", Context.MODE_PRIVATE)
-                                .getString("webTextColor", null)
+                val prefs = context.getSharedPreferences("TapLinkPrefs", Context.MODE_PRIVATE)
+                val savedTextColor = getEffectiveWebTextColor(prefs)
                 applyWebFontSettings(savedFontSize, savedTextColor)
 
                 // Initialize cursor sensitivity seekbar
@@ -6230,6 +6254,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             // Get locations of all interactive elements
             val volumeSeekBar = menu.findViewById<SeekBar>(R.id.volumeSeekBar)
             val brightnessSeekBar = menu.findViewById<SeekBar>(R.id.brightnessSeekBar)
+            val forceDarkButton = menu.findViewById<Button>(R.id.btnToggleForceDark)
             val smoothnessSeekBar = menu.findViewById<SeekBar>(R.id.smoothnessSeekBar)
             val screenSizeSeekBar = menu.findViewById<SeekBar>(R.id.screenSizeSeekBar)
             val horizontalPosSeekBar = menu.findViewById<SeekBar>(R.id.horizontalPosSeekBar)
@@ -6315,6 +6340,21 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     brightnessSeekBar.isPressed = true
                     Handler(Looper.getMainLooper())
                             .postDelayed({ brightnessSeekBar.isPressed = false }, 100)
+                    return
+                }
+
+                // Check if click is on force dark toggle button
+                val forceDarkRect = getRect(forceDarkButton)
+                if (forceDarkButton != null && contains(forceDarkRect, buttonSlop)) {
+                    val prefs = context.getSharedPreferences("TapLinkPrefs", Context.MODE_PRIVATE)
+                    val currentlyEnabled = prefs.getBoolean("forceDarkWebEnabled", true)
+                    val newEnabled = !currentlyEnabled
+                    (context as? MainActivity)?.setForceDarkWebEnabled(newEnabled)
+                    forceDarkButton.text = if (newEnabled) "Force Dark: On" else "Force Dark: Off"
+
+                    forceDarkButton.isPressed = true
+                    Handler(Looper.getMainLooper())
+                            .postDelayed({ forceDarkButton.isPressed = false }, 100)
                     return
                 }
 
@@ -6655,9 +6695,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                             .apply()
 
                     // Apply to WebView
-                    val savedTextColor =
-                            context.getSharedPreferences("TapLinkPrefs", Context.MODE_PRIVATE)
-                                    .getString("webTextColor", null)
+                    val prefs = context.getSharedPreferences("TapLinkPrefs", Context.MODE_PRIVATE)
+                    val savedTextColor = getEffectiveWebTextColor(prefs)
                     applyWebFontSettings(50, savedTextColor)
 
                     // Visual feedback
@@ -6727,9 +6766,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                             .apply()
 
                     // Apply to WebView
-                    val savedTextColor =
-                            context.getSharedPreferences("TapLinkPrefs", Context.MODE_PRIVATE)
-                                    .getString("webTextColor", null)
+                    val prefs = context.getSharedPreferences("TapLinkPrefs", Context.MODE_PRIVATE)
+                    val savedTextColor = getEffectiveWebTextColor(prefs)
                     applyWebFontSettings(newProgress, savedTextColor)
 
                     // Visual feedback
@@ -6855,6 +6893,17 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
     }
 
+    fun getAllWebViews(): List<WebView> {
+        return windows.map { it.webView }
+    }
+
+    private fun getEffectiveWebTextColor(
+            prefs: android.content.SharedPreferences
+    ): String? {
+        val overrideEnabled = prefs.getBoolean("webTextColorOverrideEnabled", false)
+        return if (overrideEnabled) prefs.getString("webTextColor", null) else null
+    }
+
     /**
      * Apply text color to webpage AND custom UI, then save preference.
      * @param colorHex Hex color string (e.g., "#FFFFFF")
@@ -6864,6 +6913,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         context.getSharedPreferences("TapLinkPrefs", Context.MODE_PRIVATE)
                 .edit()
                 .putString("webTextColor", colorHex)
+                .putBoolean("webTextColorOverrideEnabled", colorHex != null)
                 .apply()
 
         // Update Custom UI (Settings & Keyboard)
@@ -6923,7 +6973,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     fun reapplyWebFontSettings() {
         val prefs = context.getSharedPreferences("TapLinkPrefs", Context.MODE_PRIVATE)
         val fontSizeProgress = prefs.getInt("webFontSize", 50)
-        val textColor = prefs.getString("webTextColor", null)
+        val textColor = getEffectiveWebTextColor(prefs)
 
         applyWebFontSettings(fontSizeProgress, textColor)
 

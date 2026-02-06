@@ -3310,11 +3310,41 @@ class MainActivity :
 
         // Ensure the correct touch listener is attached (though configureWebView likely did it)
         attachTouchListener(webView)
+        applyForceDarkModeSetting(webView)
 
         // Persist the newly active window so reopen returns to the correct tab/page.
 
         // Persist the newly active window so reopen returns to the correct tab/page.
         persistActiveWebViewState("onWindowSwitched", webView)
+    }
+
+    private fun isForceDarkWebEnabled(): Boolean {
+        return getSharedPreferences("TapLinkPrefs", MODE_PRIVATE)
+                .getBoolean("forceDarkWebEnabled", true)
+    }
+
+    private fun applyForceDarkModeSetting(targetWebView: WebView, enabled: Boolean = isForceDarkWebEnabled()) {
+        targetWebView.settings.apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                isAlgorithmicDarkeningAllowed = enabled
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                @Suppress("DEPRECATION") forceDark =
+                        if (enabled) WebSettings.FORCE_DARK_ON else WebSettings.FORCE_DARK_OFF
+            }
+        }
+    }
+
+    fun setForceDarkWebEnabled(enabled: Boolean) {
+        getSharedPreferences("TapLinkPrefs", MODE_PRIVATE)
+                .edit()
+                .putBoolean("forceDarkWebEnabled", enabled)
+                .apply()
+
+        if (::dualWebViewGroup.isInitialized) {
+            dualWebViewGroup.getAllWebViews().forEach { applyForceDarkModeSetting(it, enabled) }
+        } else if (::webView.isInitialized) {
+            applyForceDarkModeSetting(webView, enabled)
+        }
     }
 
     private fun attachTouchListener(targetWebView: WebView) {
@@ -3489,32 +3519,24 @@ class MainActivity :
                     safeBrowsingEnabled = true
                 }
 
-                // Force Dark Mode
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    isAlgorithmicDarkeningAllowed = true
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    @Suppress("DEPRECATION") forceDark = WebSettings.FORCE_DARK_ON
-                }
-
-                val wvVersion = "145.0.0.0"
                 // Store default UA for sites that require it (like Netflix)
                 if (defaultUserAgent == null) {
                     defaultUserAgent = WebSettings.getDefaultUserAgent(this@MainActivity)
                 }
 
-                customUserAgent =
-                        "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE}; ${Build.MODEL}) " +
-                                "AppleWebKit/537.36 (KHTML, like Gecko) " +
-                                "Chrome/$wvVersion Mobile Safari/537.36"
+                // Use the actual runtime WebView UA to avoid auth providers flagging spoofed clients.
+                customUserAgent = defaultUserAgent
+                if (!customUserAgent.isNullOrBlank()) {
+                    settings.userAgentString = customUserAgent
 
-                settings.userAgentString = customUserAgent
-
-                // Pass the custom UA to DualWebViewGroup so it can use it for Mobile Mode
-                dualWebViewGroup.setMobileUserAgent(customUserAgent!!)
+                    // Pass runtime UA to DualWebViewGroup so mobile/desktop modes derive from it.
+                    dualWebViewGroup.setMobileUserAgent(customUserAgent!!)
+                }
 
                 // Explicitly enable media
                 setMediaPlaybackRequiresUserGesture(false)
             }
+            applyForceDarkModeSetting(this)
 
             // Enable third-party cookies specifically for auth
             CookieManager.getInstance().apply {
