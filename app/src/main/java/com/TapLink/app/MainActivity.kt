@@ -2019,7 +2019,6 @@ class MainActivity :
                                                                             dualWebViewGroup
                                                                                     .urlEditText
                                                                                     .selectionStart
-
                                                                     // Insert the text at cursor
                                                                     // position
                                                                     val newText =
@@ -3786,7 +3785,8 @@ class MainActivity :
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 isAlgorithmicDarkeningAllowed = enabled
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                @Suppress("DEPRECATION") forceDark =
+                @Suppress("DEPRECATION")
+                forceDark =
                         if (enabled) WebSettings.FORCE_DARK_ON else WebSettings.FORCE_DARK_OFF
             }
         }
@@ -3950,7 +3950,8 @@ class MainActivity :
                 // JavaScript and Content Settings
                 javaScriptEnabled = true
                 domStorageEnabled = true
-                @Suppress("DEPRECATION") databaseEnabled = true
+                @Suppress("DEPRECATION")
+                databaseEnabled = true
                 javaScriptCanOpenWindowsAutomatically = false
                 mediaPlaybackRequiresUserGesture = false
 
@@ -3960,7 +3961,8 @@ class MainActivity :
                 setGeolocationEnabled(true)
 
                 // Display and Layout Settings
-                @Suppress("DEPRECATION") defaultZoom = WebSettings.ZoomDensity.MEDIUM
+                @Suppress("DEPRECATION")
+                defaultZoom = WebSettings.ZoomDensity.MEDIUM
                 useWideViewPort = true
                 loadWithOverviewMode = true
                 layoutAlgorithm = WebSettings.LayoutAlgorithm.NORMAL
@@ -4545,7 +4547,8 @@ class MainActivity :
             mediaPlaybackRequiresUserGesture = false
             domStorageEnabled = true
             javaScriptEnabled = true
-            @Suppress("DEPRECATION") databaseEnabled = true
+            @Suppress("DEPRECATION")
+            databaseEnabled = true
             useWideViewPort = true
             loadWithOverviewMode = true
             setSupportMultipleWindows(true)
@@ -4891,6 +4894,7 @@ class MainActivity :
     }
 
     private fun applyDefaultQrZoom(scannerView: DecoratedBarcodeView) {
+        @Suppress("DEPRECATION")
         scannerView.changeCameraParameters { parameters: Camera.Parameters ->
             try {
                 CameraConfigurationUtils.setZoom(parameters, defaultQrZoomRatio)

@@ -150,7 +150,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private val idleThresholdMs = 5000L // 5 seconds before considered idle
     private val idleRefreshIntervalMs = 100L // ~10fps when idle
 
-    private var leftSystemInfoView: SystemInfoView
+    private lateinit var leftSystemInfoView: SystemInfoView
 
     lateinit var leftNavigationBar: View
     private val navBarHeightPx = 32.dp()
@@ -160,7 +160,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     val keyboardContainer: FrameLayout =
             FrameLayout(context).apply {
                 val containerWidth = 640 - toggleBarWidthPx
-                val containerHeight = 480 - navBarHeightPx
                 layoutParams =
                         FrameLayout.LayoutParams(
                                         containerWidth,
@@ -233,7 +232,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     private var isBookmarkEditing = false
 
-    private lateinit var mobileUserAgent: String
+    private var mobileUserAgent: String
     private var desktopUserAgent: String = ""
 
     private val verticalScrollFraction = 0.25f // Scroll vertically by 25% of the viewport per tap
@@ -340,7 +339,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     }
 
     // Properties for link editing
-    var urlEditText: EditText
+    lateinit var urlEditText: EditText
     private val urlFieldMinHeight = 56.dp()
 
     private var leftEditField: EditText
@@ -750,8 +749,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             verticalScrollBar.visibility = View.GONE
 
             (webViewsContainer.layoutParams as? FrameLayout.LayoutParams)?.let { p ->
-                var targetWidth = 0
-                var targetHeight = 0
+                var targetWidth: Int
+                var targetHeight: Int
                 if (isScrollModeActive) {
                     targetWidth = containerWidth
                     targetHeight = (480 - keyboardHeight).coerceAtLeast(0)
@@ -821,11 +820,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             val rightMarginShift = if (verticalScrollBar.visibility == View.VISIBLE) 20 else 0
             val bottomMarginShift = if (horizontalScrollBar.visibility == View.VISIBLE) 20 else 0
 
-            var targetWidth = 0
-            var targetHeight = 0
-            var targetLeftMargin = 0
-            var targetBottomMargin = 0
-            var targetRightMargin = 0
+            var targetWidth: Int
+            var targetHeight: Int
+            var targetLeftMargin: Int
+            var targetBottomMargin: Int
+            var targetRightMargin: Int
 
             if (isScrollModeActive) {
                 // Scroll Mode: 640 total width
@@ -1955,10 +1954,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     override fun onPageFinished(view: android.webkit.WebView?, url: String?) {
                         super.onPageFinished(view, url)
                         try {
-                            val mediaInterfaceClass =
-                                    Class.forName(
-                                            "com.TapLinkX3.app.DualWebViewGroup\$MediaInterface"
-                                    )
+                            // val mediaInterfaceClass =
+                            //        Class.forName(
+                            //                "com.TapLinkX3.app.DualWebViewGroup\$MediaInterface"
+                            //        )
                             // Actually we are inside DualWebViewGroup, so can call method directly?
                             // Yes, injectMediaListeners() is a private method of DualWebViewGroup.
                             // But WebViewClient is an anonymous inner class.
@@ -2084,7 +2083,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             setOnClickListener {
                 // DebugLog.d("KeyboardDebug", "leftKeyboardContainer clicked")
             }
-            setOnTouchListener { _, event ->
+            setOnTouchListener { _, _ ->
                 // DebugLog.d("KeyboardDebug", "leftKeyboardContainer received touch event:
                 // ${event.action}")
                 true
@@ -2636,7 +2635,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     fun showFullScreenOverlay(view: View) {
         fullscreenEntryCount++
         val viewHashCode = view.hashCode()
-        val isSameView = viewHashCode == lastFullscreenViewHashCode
+        // val isSameView = viewHashCode == lastFullscreenViewHashCode
         lastFullscreenViewHashCode = viewHashCode
 
         // Remove from current parent if any
@@ -2684,16 +2683,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         previousFullScreenVisibility.clear()
         DebugLog.d("FullscreenDebug", "Hiding ${fullScreenHiddenViews.size} UI elements")
         fullScreenHiddenViews.forEach { target ->
-            val name =
-                    when (target) {
-                        webView -> "webView"
-                        leftToggleBar -> "leftToggleBar"
-                        leftNavigationBar -> "leftNavigationBar"
-                        keyboardContainer -> "keyboardContainer"
-                        leftSystemInfoView -> "leftSystemInfoView"
-                        urlEditText -> "urlEditText"
-                        else -> "unknown"
-                    }
+
             // DebugLog.d("FullscreenDebug", "  Hiding $name (was ${if (target.visibility ==
             // View.VISIBLE) "VISIBLE" else "GONE/INVISIBLE"})")
             previousFullScreenVisibility[target] = target.visibility
@@ -2742,16 +2732,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         fullScreenOverlayContainer.elevation = 0f
 
         previousFullScreenVisibility.forEach { (target, visibility) ->
-            val name =
-                    when (target) {
-                        webView -> "webView"
-                        leftToggleBar -> "leftToggleBar"
-                        leftNavigationBar -> "leftNavigationBar"
-                        keyboardContainer -> "keyboardContainer"
-                        leftSystemInfoView -> "leftSystemInfoView"
-                        urlEditText -> "urlEditText"
-                        else -> "unknown"
-                    }
+
             // DebugLog.d("FullscreenDebug", "  Restoring $name to ${if (visibility == View.VISIBLE)
             // "VISIBLE" else "GONE/INVISIBLE"}")
             target.visibility = visibility
@@ -2944,8 +2925,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         val scale = uiScale
 
         // Convert to local coordinates relative to mask overlay
-        val localX = screenX - location[0]
-        val localY = screenY - location[1]
+        // val localX = screenX - location[0]
+        // val localY = screenY - location[1]
 
         // DebugLog.d("MediaControls", "dispatchMaskOverlayTouch at local ($localX, $localY), scale:
         // $scale")
@@ -4779,8 +4760,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
 
         // Fallback: keep runtime UA and strip obvious embedded/mobile markers.
-        return mobileUa
-                .replace(Regex(""";\s*wv\b"""), "")
+        return mobileUa.replace(Regex(""";\s*wv\b"""), "")
                 .replace(Regex("""\sVersion/\d+(\.\d+)*"""), "")
                 .replace(Regex("""\sMobile\b"""), "")
                 .replace(Regex("""\s{2,}"""), " ")
@@ -5052,7 +5032,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
         // Check bottom navigation bar buttons ONLY if nav bar is visible
         if (leftNavigationBar.visibility == View.VISIBLE) {
-            navButtons.forEach { (name, navButton) ->
+            navButtons.forEach { (_, navButton) ->
                 if (isOver(navButton.left, screenX, screenY)) {
                     navButton.isHovered = true
                     navButton.left.isHovered = true
@@ -5075,7 +5055,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         Triple(R.id.btnAnchor, "Anchor") { isHoveringAnchorToggle = true }
                 )
 
-        for ((buttonId, name, setHoverFlag) in toggleBarButtons) {
+        for ((buttonId, _, setHoverFlag) in toggleBarButtons) {
             val button = leftToggleBar.findViewById<View>(buttonId)
             if (isOver(button, screenX, screenY)) {
                 button?.isHovered = true
@@ -6054,7 +6034,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     elevation = 4f
                     alpha = 1f
                     isEnabled = true
-                    setOnTouchListener { v, event ->
+                    setOnTouchListener { v, _ ->
                         val location = IntArray(2)
                         v.getLocationOnScreen(location)
                         val parentLocation = IntArray(2)
@@ -6169,7 +6149,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 val forceDarkEnabled =
                         context.getSharedPreferences("TapLinkPrefs", Context.MODE_PRIVATE)
                                 .getBoolean("forceDarkWebEnabled", true)
-                forceDarkButton?.text = if (forceDarkEnabled) "Force Dark: On" else "Force Dark: Off"
+                forceDarkButton?.text =
+                        if (forceDarkEnabled) "Force Dark: On" else "Force Dark: Off"
 
                 // Initialize smoothness seekbar from saved preference
                 val smoothnessSeekBar = menu.findViewById<SeekBar>(R.id.smoothnessSeekBar)
@@ -6454,8 +6435,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
                 if (resetSensitivityButton != null && contains(resetSensitivityRect, buttonSlop)) {
                     // Reset to 50%
-                    val sensitivitySeekBar =
-                            menu.findViewById<SeekBar>(R.id.cursorSensitivitySeekBar)
+                    // val sensitivitySeekBar =
+                    //        menu.findViewById<SeekBar>(R.id.cursorSensitivitySeekBar)
                     sensitivitySeekBar?.progress = 50
 
                     context.getSharedPreferences("TapLinkPrefs", Context.MODE_PRIVATE)
@@ -6927,9 +6908,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         return windows.map { it.webView }
     }
 
-    private fun getEffectiveWebTextColor(
-            prefs: android.content.SharedPreferences
-    ): String? {
+    private fun getEffectiveWebTextColor(prefs: android.content.SharedPreferences): String? {
         val overrideEnabled = prefs.getBoolean("webTextColorOverrideEnabled", false)
         return if (overrideEnabled) prefs.getString("webTextColor", null) else null
     }
@@ -7992,17 +7971,17 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     fun toggleMediaPlayback() {
         if (isMediaPlaying) {
-             pauseMedia()
+            pauseMedia()
         } else {
-             playMedia()
+            playMedia()
         }
     }
 
     fun playMedia() {
         val webView = getMediaControlWebView()
         webView.evaluateJavascript(
-            "var m = document.querySelector('video, audio'); if (m) m.play();",
-            null
+                "var m = document.querySelector('video, audio'); if (m) m.play();",
+                null
         )
         updateMediaState(true)
     }
@@ -8010,8 +7989,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     fun pauseMedia() {
         val webView = getMediaControlWebView()
         webView.evaluateJavascript(
-            "var m = document.querySelector('video, audio'); if (m) m.pause();",
-            null
+                "var m = document.querySelector('video, audio'); if (m) m.pause();",
+                null
         )
         updateMediaState(false)
     }
