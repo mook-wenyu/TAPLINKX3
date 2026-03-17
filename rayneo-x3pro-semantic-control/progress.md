@@ -12,4 +12,6 @@
 - Implemented real semantic traversal in the semantic navigator.
 - Added unit tests for traversal planner behavior.
 - Verified `testDebugUnitTest` and `:app:assembleDebug` in the isolated worktree.
-- Next: integrate pinch-confirm as a thin adapter over the focused-action path.
+- Added a thin pinch-confirm adapter that reuses the existing focused activation path.
+- Added unit tests for pinch-confirm routing and cooldown behavior.
+- Next: audit target apps before expanding camera-backed gesture input.

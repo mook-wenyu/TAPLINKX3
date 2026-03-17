@@ -16,14 +16,16 @@
 - 实现真正的 `FocusNext / FocusPrevious` 遍历逻辑
 - 将 `ActivateFocused` 收紧为“基于当前焦点及其可点击祖先”的安全激活路径
 - 为遍历决策增加本地单测，并通过 `testDebugUnitTest`
+- 实现 `pinch -> activate focused target` 的最小适配层
+- 为 pinch-confirm 路径增加本地单测，并验证不会在未确认或 cooldown 状态下重复触发
 - 写入产品策略、实施计划和项目 README
 
 ### 未完成
 
-- 真正的 pinch 输入接入
 - App 审计与白名单策略
+- 真实相机手势 provider 接入
 
-说明：当前剩余待办已收敛为 pinch 接入与 App 审计两大块。
+说明：当前 feature work 已完成到 MVP 所需的确认链路，下一步应先转向 App 审计，再决定是否接入真实相机 provider。
 
 ### 当前判断
 
@@ -32,3 +34,4 @@
 - 不扩张到全局空气鼠标
 - 不提前绑定厂商私有深度接口
 - 不在没有 App 审计结果前承诺“全局支持”
+- 在 App 审计前，不继续扩张新的交互 feature。

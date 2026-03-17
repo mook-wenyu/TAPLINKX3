@@ -7,7 +7,7 @@
 - 短期：`Accessibility-first + pinch confirm + focus navigation`
 - 长期：`全局语义控制 + 白名单 App 深适配`
 
-当前版本只完成了单模块工程骨架与包级职责分层，没有开始接入真实手势识别、厂商 SDK 或白名单适配逻辑。
+当前版本已经完成单模块工程骨架、语义焦点遍历，以及 `pinch -> activate focused target` 的最小确认适配层，但尚未开始接入真实相机手势 provider、厂商 SDK 或白名单适配逻辑。
 
 出于 MVP 边界控制，当前清单里只保留无障碍服务接入所需的最小能力，尚未提前申请相机、悬浮层或前台服务权限。
 
@@ -30,10 +30,9 @@
 
 ## 下一步
 
-1. 验证 X3 Pro 上 `AccessibilityService`、overlay、前台服务与相机权限策略。
-2. 接入 `pinch -> activate` 的最小手势链路。
-3. 实现 `next / previous / activate / back / home` 五个 MVP 动作。
-4. 审计首批目标 App 的 accessibility tree 质量。
+1. 审计首批目标 App 的 accessibility tree、focusability 与 activation 质量。
+2. 基于审计结果决定下一步是做兼容性归一化，还是再接入真实相机手势 provider。
+3. 保持当前 MVP 边界，不扩张到多手势词汇或白名单深适配实现。
 
 ## 构建
 

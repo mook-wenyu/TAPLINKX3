@@ -10,7 +10,9 @@ class GestureEngine(
     private val _pinchState = MutableStateFlow(PinchState.Idle)
     val pinchState: StateFlow<PinchState> = _pinchState
 
-    fun onSignal(signal: GestureSignal) {
-        _pinchState.value = stateMachine.transition(signal)
+    fun onSignal(signal: GestureSignal): PinchState {
+        val nextState = stateMachine.transition(signal)
+        _pinchState.value = nextState
+        return nextState
     }
 }
