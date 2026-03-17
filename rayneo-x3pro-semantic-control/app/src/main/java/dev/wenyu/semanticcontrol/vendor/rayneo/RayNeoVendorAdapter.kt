@@ -1,6 +1,7 @@
 package dev.wenyu.semanticcontrol.vendor.rayneo
 
 import android.app.Application
+import dev.wenyu.semanticcontrol.core.contracts.SemanticAction
 
 class RayNeoVendorAdapter(
     private val mercuryRuntime: MercuryRuntime = MercurySdkRuntime(),
@@ -20,5 +21,11 @@ class RayNeoVendorAdapter(
                     reason = "${error::class.java.simpleName}: ${error.message ?: "unknown error"}",
                 )
             }
+    }
+
+    fun createInputAdapter(
+        onSemanticAction: (SemanticAction) -> Boolean,
+    ): VendorInputAdapter {
+        return MercuryTouchInputAdapter(onSemanticAction)
     }
 }

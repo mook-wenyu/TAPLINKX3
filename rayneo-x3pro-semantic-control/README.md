@@ -7,7 +7,7 @@
 - 短期：`Accessibility-first + pinch confirm + focus navigation`
 - 长期：`全局语义控制 + 白名单 App 深适配`
 
-当前版本已经完成单模块工程骨架、语义焦点遍历、`pinch -> activate focused target` 的最小确认适配层，以及第一版 `RayNeo vendor adapter boundary + Mercury bootstrap`。
+当前版本已经完成单模块工程骨架、语义焦点遍历、`pinch -> activate focused target` 的最小确认适配层、第一版 `RayNeo vendor adapter boundary + Mercury bootstrap`，以及 `TouchDispatcherX3` 到内部语义动作的最小输入 spike。
 
 最新的本地 SDK 逆向分析表明：
 
@@ -38,9 +38,9 @@
 
 ## 下一步
 
-1. 原型验证 `TouchDispatcherX3 + CommonTouchCallback` 到内部语义动作的映射，优先验证 `pinch -> confirm` 与方向滑动 -> 焦点移动。
-2. 在真机上审计首批目标 App 的 accessibility tree、focusability 与 activation 质量。
-3. 在完成审计前，不扩张到 `RingIPCHelper`、原始 `IRemoteService` 消息协议、多手势词汇或白名单深适配实现。
+1. 在真机上审计首批目标 App 的 accessibility tree、focusability 与 activation 质量。
+2. 基于审计结果决定是否真的需要 `FocusTracker / RecyclerViewFocusTracker`，而不是先把 vendor 焦点体系并入主线。
+3. 在完成审计前，不扩张到 `RingIPCHelper`、原始 `IRemoteService` 消息协议、多手势词汇、相机 provider 或白名单深适配实现。
 
 ## 构建
 

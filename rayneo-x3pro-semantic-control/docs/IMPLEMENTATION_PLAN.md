@@ -24,6 +24,7 @@
 - [x] Completed local reverse inspection of `RayNeoIPCSDK` and `MercuryAndroidSDK`
 - [x] Compared `MercuryAndroidSDK` v0.2.2 and v0.2.5 public API surface
 - [x] Introduced a minimal RayNeo vendor adapter boundary and Mercury bootstrap
+- [x] Implemented a minimal `TouchDispatcherX3 + CommonTouchCallback` input spike
 - [ ] Implemented camera-backed gesture provider pipeline
 - [ ] Completed target app accessibility audit
 
@@ -102,5 +103,5 @@
 - [x] Bucket vendor capabilities into MVP / prototype / defer groups
 - [x] Introduce an internal vendor adapter package boundary in code
 - [x] Bootstrap Mercury through an internal runtime wrapper and manifest handshake
-- [ ] Prototype `TouchDispatcherX3 + CommonTouchCallback` as an X3-native input shim
+- [x] Prototype `TouchDispatcherX3 + CommonTouchCallback` as an X3-native input shim
 - [ ] Verify whether `FocusTracker` materially improves on the existing accessibility-first focus model

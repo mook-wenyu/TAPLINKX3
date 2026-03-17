@@ -18,4 +18,6 @@
 - Compared Mercury v0.2.2 and v0.2.5 and found the public adaptation surface largely stable, with new focus-related hints in v0.2.5.
 - Added a dedicated `vendor.rayneo` adapter boundary and kept the only `com.ffalcon` import inside it.
 - Bootstrapped Mercury through an internal runtime wrapper and added the RayNeo manifest handshake.
-- Next: prototype `TouchDispatcherX3` input translation before expanding into IPC-heavy or camera-backed features.
+- Added a minimal `TouchDispatcherX3 + CommonTouchCallback` input adapter that maps into existing semantic actions.
+- Added unit tests for the touch semantic bridge and kept the full build green.
+- Next: audit target apps before deciding whether vendor focus helpers are actually needed.

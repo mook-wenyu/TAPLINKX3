@@ -23,15 +23,18 @@
 - 对比 `MercuryAndroidSDK` v0.2.2 与 v0.2.5，确认关键公开 API 基本稳定，且新版新增 `FocusConfig` / `FocusViewHandle` 焦点相关信号
 - 建立 `vendor.rayneo` 包边界，确保 `com.ffalcon*` 只在适配层内出现
 - 接入 `MercurySDK.init(...)` 与 RayNeo manifest handshake，并保持主线单测/构建通过
+- 实现 `TouchDispatcherX3 + CommonTouchCallback` 到内部语义动作的最小输入适配层
+- 保持 `TouchDispatcherX3` 只经由 `vendor.rayneo` 包进入主线，不改写现有语义导航模型
+- 为输入映射 bridge 增加本地单测，并通过主线单测和 `assembleDebug`
 - 写入产品策略、实施计划和项目 README
 
 ### 未完成
 
 - App 审计与白名单策略
-- `TouchDispatcherX3 + CommonTouchCallback` 输入 spike
+- 是否需要 `FocusTracker / RecyclerViewFocusTracker` 的真机判断
 - 真实相机手势 provider 接入
 
-说明：当前 feature work 已完成到 MVP 所需的确认链路和 Mercury bootstrap。基于 SDK 逆向结果，下一步不建议优先做通用相机 provider，而应先做 `TouchDispatcherX3` 输入 spike，并审计是否真的需要 vendor 焦点辅助。
+说明：当前 feature work 已完成到 MVP 所需的确认链路、Mercury bootstrap 和 `TouchDispatcherX3` 输入 spike。下一步不应继续扩张输入 feature，而应先做 App 审计，并判断是否真的需要 vendor 焦点辅助。
 
 ### 当前判断
 
