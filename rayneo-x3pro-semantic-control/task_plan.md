@@ -14,6 +14,7 @@ Create a standalone Android-native project for RayNeo X3 Pro semantic control, t
 | Generate wrapper and verify build | completed | Local wrapper generated and baseline `:app:assembleDebug` passed. |
 | Implement semantic traversal slice | completed | Added deterministic focus traversal and safer focused activation, then verified with unit tests and debug build in an isolated worktree. |
 | Implement pinch confirm slice | completed | Added a thin pinch-confirm adapter over the validated focused-activation path and verified unit tests plus debug build in an isolated worktree. |
+| Analyze RayNeo vendor SDKs | completed | Reverse-inspected local AARs, compared Mercury versions, and mapped vendor capabilities into MVP, prototype, and deferred buckets. |
 
 ## Decisions
 
@@ -24,3 +25,4 @@ Create a standalone Android-native project for RayNeo X3 Pro semantic control, t
 - Keep product scope small until accessibility audits are complete.
 - Build focus traversal before wiring pinch confirmation, because confirmation without a stable focus target is product drift.
 - Run the target-app audit before expanding into camera-backed gesture provider work.
+- Treat RayNeo SDKs as hardware adaptation shims, not the app architecture.

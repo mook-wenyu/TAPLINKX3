@@ -18,14 +18,18 @@
 - 为遍历决策增加本地单测，并通过 `testDebugUnitTest`
 - 实现 `pinch -> activate focused target` 的最小适配层
 - 为 pinch-confirm 路径增加本地单测，并验证不会在未确认或 cooldown 状态下重复触发
+- 完成对 `RayNeoIPCSDK` 与 `MercuryAndroidSDK` 的本地反编译级接口检查
+- 确认 `MercuryAndroidSDK` 更接近输入/焦点/UI 适配层，`RayNeoIPCSDK` 更接近系统服务/IPC 层
+- 对比 `MercuryAndroidSDK` v0.2.2 与 v0.2.5，确认关键公开 API 基本稳定，且新版新增 `FocusConfig` / `FocusViewHandle` 焦点相关信号
 - 写入产品策略、实施计划和项目 README
 
 ### 未完成
 
 - App 审计与白名单策略
+- RayNeo vendor adapter 边界代码化
 - 真实相机手势 provider 接入
 
-说明：当前 feature work 已完成到 MVP 所需的确认链路，下一步应先转向 App 审计，再决定是否接入真实相机 provider。
+说明：当前 feature work 已完成到 MVP 所需的确认链路。基于 SDK 逆向结果，下一步不建议优先做通用相机 provider，而应先定义 RayNeo vendor adapter 边界，并审计是否真的需要 vendor 焦点辅助。
 
 ### 当前判断
 
@@ -35,3 +39,5 @@
 - 不提前绑定厂商私有深度接口
 - 不在没有 App 审计结果前承诺“全局支持”
 - 在 App 审计前，不继续扩张新的交互 feature。
+- `MercuryAndroidSDK` 可作为 X3-native input shim 候选，但不应上升为应用主架构。
+- `RayNeoIPCSDK` 暂不进入 MVP 主路径。

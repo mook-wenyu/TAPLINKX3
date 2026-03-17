@@ -11,6 +11,9 @@
 - Android Accessibility APIs provide a legitimate semantic action layer.
 - MediaPipe-style hand tracking is available on Android, but device/runtime exposure remains a separate gate.
 - Vendor XR SDK signals exist, but should not be treated as the initial dependency boundary.
+- `MercuryAndroidSDK` looks like the X3-native input/focus/mirroring layer.
+- `RayNeoIPCSDK` looks like a service/IPC/speech/GPS/ring integration layer with string-message risk.
+- `MercuryAndroidSDK` v0.2.5 keeps the core public surface stable and adds focus-related signals, which increases confidence in a vendor-adapter-first path.
 
 ## Engineering findings
 
