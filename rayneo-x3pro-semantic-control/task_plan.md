@@ -12,6 +12,7 @@ Create a standalone Android-native project for RayNeo X3 Pro semantic control, t
 | Create project scaffold | completed | Single-module Android project created with package-level layers for contracts, gesture, overlay, and semantic code. |
 | Write project docs | completed | README, product strategy, implementation plan, and progress docs created. |
 | Generate wrapper and verify build | completed | Local wrapper generated and baseline `:app:assembleDebug` passed. |
+| Implement semantic traversal slice | completed | Added deterministic focus traversal and safer focused activation, then verified with unit tests and debug build in an isolated worktree. |
 
 ## Decisions
 
@@ -20,3 +21,4 @@ Create a standalone Android-native project for RayNeo X3 Pro semantic control, t
 - Keep vendor-specific interfaces optional.
 - Keep gesture recognition behind replaceable abstractions.
 - Keep product scope small until accessibility audits are complete.
+- Build focus traversal before wiring pinch confirmation, because confirmation without a stable focus target is product drift.

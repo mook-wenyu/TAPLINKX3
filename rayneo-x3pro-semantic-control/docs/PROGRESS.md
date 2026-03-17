@@ -13,13 +13,17 @@
 - 收紧权限边界，移除当前 MVP 尚未使用的相机/前台服务/通知/悬浮层权限
 - 生成新项目本地 Gradle wrapper
 - 完成单模块重构后的 `:app:assembleDebug` 构建验证
+- 实现真正的 `FocusNext / FocusPrevious` 遍历逻辑
+- 将 `ActivateFocused` 收紧为“基于当前焦点及其可点击祖先”的安全激活路径
+- 为遍历决策增加本地单测，并通过 `testDebugUnitTest`
 - 写入产品策略、实施计划和项目 README
 
 ### 未完成
 
-- 真正的焦点遍历逻辑
 - 真正的 pinch 输入接入
 - App 审计与白名单策略
+
+说明：当前剩余待办已收敛为 pinch 接入与 App 审计两大块。
 
 ### 当前判断
 
