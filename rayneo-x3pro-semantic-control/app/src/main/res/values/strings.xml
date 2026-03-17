@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Semantic Control</string>
+    <string name="launcher_summary">独立 Android 项目骨架已创建。当前版本已经收敛为单 app 模块，使用包级分层组织 Accessibility、手势、语义动作与 HUD 占位实现。</string>
+    <string name="architecture_header">当前结构</string>
+    <string name="architecture_body">单 app 模块 + 包级分层：app、core.contracts、feature.gesture、feature.overlay、feature.semantic。</string>
+    <string name="next_steps_header">下一步</string>
+    <string name="next_steps_body">1. 接入 AccessibilityService。 2. 接入 pinch-confirm 输入链。 3. 建立焦点导航与 HUD 反馈。 4. 做首批目标 App 审计与白名单策略。</string>
+    <string name="a11y_service_label">Semantic Control Service</string>
+    <string name="a11y_service_description">基于 Accessibility 的语义控制服务骨架。</string>
+</resources>
