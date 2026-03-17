@@ -44,6 +44,8 @@ kotlin {
 }
 
 dependencies {
+    implementation(files("libs/MercuryAndroidSDK-v0.2.5-20260212110627_ceaebc13.aar"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

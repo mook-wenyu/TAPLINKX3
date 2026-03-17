@@ -7,7 +7,7 @@
 - 短期：`Accessibility-first + pinch confirm + focus navigation`
 - 长期：`全局语义控制 + 白名单 App 深适配`
 
-当前版本已经完成单模块工程骨架、语义焦点遍历，以及 `pinch -> activate focused target` 的最小确认适配层。
+当前版本已经完成单模块工程骨架、语义焦点遍历、`pinch -> activate focused target` 的最小确认适配层，以及第一版 `RayNeo vendor adapter boundary + Mercury bootstrap`。
 
 最新的本地 SDK 逆向分析表明：
 
@@ -27,6 +27,7 @@
   - `dev.wenyu.semanticcontrol.feature.gesture`
   - `dev.wenyu.semanticcontrol.feature.overlay`
   - `dev.wenyu.semanticcontrol.feature.semantic`
+  - `dev.wenyu.semanticcontrol.vendor.rayneo`
 
 ## 当前边界
 
@@ -37,10 +38,9 @@
 
 ## 下一步
 
-1. 在独立 vendor adapter 边界内接入 `MercurySDK.init(...)` 与 RayNeo manifest handshake。
-2. 原型验证 `TouchDispatcherX3 + CommonTouchCallback` 到内部语义动作的映射，优先验证 `pinch -> confirm` 与方向滑动 -> 焦点移动。
-3. 在真机上审计首批目标 App 的 accessibility tree、focusability 与 activation 质量。
-4. 在完成审计前，不扩张到 `RingIPCHelper`、原始 `IRemoteService` 消息协议、多手势词汇或白名单深适配实现。
+1. 原型验证 `TouchDispatcherX3 + CommonTouchCallback` 到内部语义动作的映射，优先验证 `pinch -> confirm` 与方向滑动 -> 焦点移动。
+2. 在真机上审计首批目标 App 的 accessibility tree、focusability 与 activation 质量。
+3. 在完成审计前，不扩张到 `RingIPCHelper`、原始 `IRemoteService` 消息协议、多手势词汇或白名单深适配实现。
 
 ## 构建
 

@@ -21,15 +21,17 @@
 - 完成对 `RayNeoIPCSDK` 与 `MercuryAndroidSDK` 的本地反编译级接口检查
 - 确认 `MercuryAndroidSDK` 更接近输入/焦点/UI 适配层，`RayNeoIPCSDK` 更接近系统服务/IPC 层
 - 对比 `MercuryAndroidSDK` v0.2.2 与 v0.2.5，确认关键公开 API 基本稳定，且新版新增 `FocusConfig` / `FocusViewHandle` 焦点相关信号
+- 建立 `vendor.rayneo` 包边界，确保 `com.ffalcon*` 只在适配层内出现
+- 接入 `MercurySDK.init(...)` 与 RayNeo manifest handshake，并保持主线单测/构建通过
 - 写入产品策略、实施计划和项目 README
 
 ### 未完成
 
 - App 审计与白名单策略
-- RayNeo vendor adapter 边界代码化
+- `TouchDispatcherX3 + CommonTouchCallback` 输入 spike
 - 真实相机手势 provider 接入
 
-说明：当前 feature work 已完成到 MVP 所需的确认链路。基于 SDK 逆向结果，下一步不建议优先做通用相机 provider，而应先定义 RayNeo vendor adapter 边界，并审计是否真的需要 vendor 焦点辅助。
+说明：当前 feature work 已完成到 MVP 所需的确认链路和 Mercury bootstrap。基于 SDK 逆向结果，下一步不建议优先做通用相机 provider，而应先做 `TouchDispatcherX3` 输入 spike，并审计是否真的需要 vendor 焦点辅助。
 
 ### 当前判断
 

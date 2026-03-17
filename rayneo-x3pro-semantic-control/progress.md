@@ -16,4 +16,6 @@
 - Added unit tests for pinch-confirm routing and cooldown behavior.
 - Reverse-inspected `RayNeoIPCSDK` and `MercuryAndroidSDK` to map adaptation-ready capabilities.
 - Compared Mercury v0.2.2 and v0.2.5 and found the public adaptation surface largely stable, with new focus-related hints in v0.2.5.
-- Next: define a RayNeo vendor adapter boundary, then audit target apps before expanding into camera-backed or IPC-heavy features.
+- Added a dedicated `vendor.rayneo` adapter boundary and kept the only `com.ffalcon` import inside it.
+- Bootstrapped Mercury through an internal runtime wrapper and added the RayNeo manifest handshake.
+- Next: prototype `TouchDispatcherX3` input translation before expanding into IPC-heavy or camera-backed features.
