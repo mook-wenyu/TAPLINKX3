@@ -16,11 +16,12 @@
 - [x] Collapsed the project into a single `app` module with package-level layering
 - [x] Added initial AccessibilityService skeleton
 - [x] Added pinch confirmation state machine skeleton
+- [x] Routed pinch confirmation into the existing safe activation path
 - [x] Added HUD overlay controller placeholder
 - [x] Generated local Gradle wrapper for the new project
 - [x] Verified clean build of the standalone project
 - [x] Implemented real focus traversal and safer focused activation behavior
-- [ ] Implemented camera/gesture pipeline
+- [ ] Implemented camera-backed gesture provider pipeline
 - [ ] Completed target app accessibility audit
 
 ## Task 1: Foundation Scaffold
@@ -59,10 +60,11 @@
 - Modify: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/feature/gesture/PinchConfirmationStateMachine.kt`
 - Create: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/feature/gesture/mediapipe/...`
 
-- [ ] Keep only one primary confirmation gesture for MVP
+- [x] Keep only one primary confirmation gesture for MVP
+- [x] Route pinch confirm into the existing focused activation path
 - [ ] Integrate a camera-backed gesture provider behind an interface
-- [ ] Add confidence, cancel, and cooldown handling
-- [ ] Add deterministic tests for the pinch state machine
+- [x] Add cancel and cooldown handling to the confirmation path
+- [x] Add deterministic tests for the pinch confirm controller path
 
 ## Task 4: Focus HUD and Recovery UX
 
