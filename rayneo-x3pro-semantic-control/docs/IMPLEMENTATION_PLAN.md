@@ -21,6 +21,8 @@
 - [x] Generated local Gradle wrapper for the new project
 - [x] Verified clean build of the standalone project
 - [x] Implemented real focus traversal and safer focused activation behavior
+- [x] Completed local reverse inspection of `RayNeoIPCSDK` and `MercuryAndroidSDK`
+- [x] Compared `MercuryAndroidSDK` v0.2.2 and v0.2.5 public API surface
 - [ ] Implemented camera-backed gesture provider pipeline
 - [ ] Completed target app accessibility audit
 
@@ -87,3 +89,16 @@
 - [ ] Audit accessibility tree quality and action reachability
 - [ ] Tag apps as `generic`, `whitelist-candidate`, or `unsupported`
 - [ ] Document whitelist triggers and non-goals
+
+## Task 6: RayNeo X3 Pro Vendor Adaptation Boundary
+
+**Files:**
+- Create: `rayneo-x3pro-semantic-control/docs/RAYNEO_SDK_ADAPTATION.md`
+- Modify: `rayneo-x3pro-semantic-control/README.md`
+- Modify: `rayneo-x3pro-semantic-control/docs/IMPLEMENTATION_PLAN.md`
+
+- [x] Reverse inspect local `RayNeoIPCSDK` and `MercuryAndroidSDK` AARs
+- [x] Bucket vendor capabilities into MVP / prototype / defer groups
+- [ ] Introduce an internal vendor adapter package boundary in code
+- [ ] Prototype `TouchDispatcherX3 + CommonTouchCallback` as an X3-native input shim
+- [ ] Verify whether `FocusTracker` materially improves on the existing accessibility-first focus model

@@ -14,4 +14,6 @@
 - Verified `testDebugUnitTest` and `:app:assembleDebug` in the isolated worktree.
 - Added a thin pinch-confirm adapter that reuses the existing focused activation path.
 - Added unit tests for pinch-confirm routing and cooldown behavior.
-- Next: audit target apps before expanding camera-backed gesture input.
+- Reverse-inspected `RayNeoIPCSDK` and `MercuryAndroidSDK` to map adaptation-ready capabilities.
+- Compared Mercury v0.2.2 and v0.2.5 and found the public adaptation surface largely stable, with new focus-related hints in v0.2.5.
+- Next: define a RayNeo vendor adapter boundary, then audit target apps before expanding into camera-backed or IPC-heavy features.
