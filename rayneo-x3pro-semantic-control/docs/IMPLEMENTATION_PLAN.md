@@ -19,7 +19,7 @@
 - [x] Added HUD overlay controller placeholder
 - [x] Generated local Gradle wrapper for the new project
 - [x] Verified clean build of the standalone project
-- [ ] Implemented real focus traversal and activation behavior
+- [x] Implemented real focus traversal and safer focused activation behavior
 - [ ] Implemented camera/gesture pipeline
 - [ ] Completed target app accessibility audit
 
@@ -46,10 +46,10 @@
 - Modify: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/feature/semantic/SemanticAccessibilityService.kt`
 - Test: `rayneo-x3pro-semantic-control/app/src/test/...`
 
-- [ ] Implement node traversal for next / previous candidate selection
-- [ ] Implement activate on focused candidate
-- [ ] Implement global back / home actions with safe fallbacks
-- [ ] Add unit tests for semantic action routing
+- [x] Implement node traversal for next / previous candidate selection
+- [x] Implement activate on focused candidate via clickable ancestor fallback
+- [x] Keep global back / home actions available in the semantic navigator
+- [ ] Add broader unit tests for semantic action routing beyond planner logic
 - [ ] Validate behavior against at least one well-structured sample app
 
 ## Task 3: Gesture Confirmation Layer

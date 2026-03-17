@@ -9,4 +9,7 @@
 - Added the initial docs set.
 - Generated a local Gradle wrapper.
 - Verified a baseline `:app:assembleDebug` build after the single-module refactor.
-- Next: implement real semantic traversal and pinch-confirm integration inside the single app module.
+- Implemented real semantic traversal in the semantic navigator.
+- Added unit tests for traversal planner behavior.
+- Verified `testDebugUnitTest` and `:app:assembleDebug` in the isolated worktree.
+- Next: integrate pinch-confirm as a thin adapter over the focused-action path.
