@@ -9,6 +9,10 @@
         android:roundIcon="@android:drawable/sym_def_app_icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.SemanticControl">
+        <meta-data
+            android:name="com.rayneo.mercury.app"
+            android:value="true" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">

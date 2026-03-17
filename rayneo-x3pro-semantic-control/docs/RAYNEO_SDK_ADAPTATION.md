@@ -189,6 +189,8 @@
 - 补上 `<meta-data android:name="com.rayneo.mercury.app" android:value="true" />`
 - 验证应用在 X3 Pro 与普通 Android 环境上的容错表现
 
+当前状态：已完成。
+
 ### 阶段 C：X3-native input spike
 
 - 用 `TouchDispatcherX3 + CommonTouchCallback` 只验证：
@@ -196,6 +198,8 @@
   - slide -> next / previous
 - 仍然复用当前已经验证过的语义焦点遍历与安全激活路径
 - 不创建第二条执行链
+
+当前状态：未开始。这是下一轮最合适的实现切片。
 
 ### 阶段 D：真机审计
 
