@@ -26,7 +26,7 @@
 - 实现 `TouchDispatcherX3 + CommonTouchCallback` 到内部语义动作的最小输入适配层
 - 保持 `TouchDispatcherX3` 只经由 `vendor.rayneo` 包进入主线，不改写现有语义导航模型
 - 为输入映射 bridge 增加本地单测，并通过主线单测和 `assembleDebug`
-- 同步 `docs/IMPLEMENTATION_PLAN.md` 与启动页文案，明确下一步是目标 App 审计、`FocusTracker / RecyclerViewFocusTracker` 判断与 `TouchDispatcherX3` 真机验证，而不是继续扩张新 feature
+- 曾在 `TouchDispatcherX3` 输入 spike 之后把计划同步成“App 审计优先”；后续路线复核与设备证据表明，这个顺序已经偏离北极星的最大不确定性，需要收回
 - 新增 `docs/app-audit.md`，固化第一轮目标 App 类别、审计维度、支持分层与 `FocusTracker` 试验门槛
 - 新增 `AppSupportTier` / `AppAuditSnapshot` 纯领域类型与单测，把 `generic / whitelist-candidate / unsupported` 判断收敛为可测试规则
 - 新增 ADB 调试控制面：可通过显式 foreground broadcast 触发 `dump-root`、`focus-next`、`focus-previous`、`activate-focused`
@@ -51,10 +51,16 @@
 - 补充最新公开技术约束：MediaPipe/on-device 手势仍是现实候选，但 Android 背景摄像头与 camera foreground service 限制意味着标准第三方 app 不能把“长期后台常驻摄像机视觉”直接当成近期默认主线
 - 已把下一条合理任务正式收敛为 `camera-vision feasibility spike`：先验证前台 camera feed 与手在画面中的可用性，而不是直接承诺后台常驻视觉手势
 - 写入产品策略、实施计划和项目 README
+- 完成路线纠偏后的第一步实现：新增前台双屏 `camera feasibility probe` 宿主页，不对首页产品 CTA 扩张新主流程
+- 新增 `CameraFeasibilitySessionTracker` 与对应单测，把相机探针的打开态、首帧时延、已分析帧数与错误状态收敛为可测试纯逻辑
+- 为首页调试路由新增 `open-camera-probe` 内部命令，让下一轮真机调试可以直接从当前双屏壳层跳入相机探针页
+- 新增 `CAMERA` 权限和可选 `camera.any` feature 声明，但仍然明确限制在前台 activity 探针，不引入前台服务或后台常驻承诺
+- 本轮再次执行 `adb kill-server && adb start-server && adb devices -l`，结果仍然没有在线设备，因此 `Task 15` 的真机取流验证尚未开始
 
 ### 未完成
 
 - App 审计与白名单策略
+- 前台 camera probe 的真机验证与日志沉淀
 - 是否需要 `FocusTracker / RecyclerViewFocusTracker` 的真机判断
 - 相机 hand-tracking provider 是否仍有必要的复盘判断
 - 系统无障碍设置页的端到端镜腿可操作性验证
@@ -62,7 +68,7 @@
 - `accessibility-enhanced` 与 `needs-attention` 的更细真机状态可视化验证
 - `camera-vision feasibility spike`
 
-说明：当前 feature work 已完成到 MVP 所需的确认链路、Mercury bootstrap 和 `TouchDispatcherX3` 输入 spike。下一步不应继续扩张输入 feature，而应先做 App 审计，并判断是否真的需要 vendor 焦点辅助。
+说明：当前 feature work 已完成到 MVP 所需的确认链路、Mercury bootstrap、`TouchDispatcherX3` 输入 spike，以及 `Task 15` 的前台 camera probe 代码准备。下一步不再是抽象争论，而是真机运行这个 probe，拿到前台取流、短时稳定性与手在画面中的直接证据；App 审计继续并行，但不再阻塞这个 camera spike。
 
 ### 当前判断
 
@@ -72,6 +78,7 @@
 - 不扩张到全局空气鼠标
 - 不提前绑定厂商私有深度接口
 - 不在没有 App 审计结果前承诺“全局支持”
-- 在 App 审计前，不继续扩张新的交互 feature。
+- 不在没有前台 camera probe 设备证据前承诺“摄像机视觉可行”
+- App 审计继续并行，但不再阻塞当前 camera feasibility spike。
 - `MercuryAndroidSDK` 可作为 X3-native input shim 候选，但不应上升为应用主架构。
 - `RayNeoIPCSDK` 暂不进入 MVP 主路径。

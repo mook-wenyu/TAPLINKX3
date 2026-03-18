@@ -232,14 +232,15 @@
 
 不是继续堆 feature，而是：
 
-1. 先在计划里加入 RayNeo vendor adapter 边界
+1. 先完成 RayNeo vendor adapter 边界
 2. 再做一个很小的 `TouchDispatcherX3` 适配 spike
-3. 然后立刻做 App 审计
+3. 然后优先验证前台 `camera feasibility spike`
+4. 将 App 审计作为并行证据轨道，服务于后续 `FocusTracker` 与白名单判断
 
-在 App 审计之前，不继续扩张：
+在前台相机可行性未验证之前，不继续扩张：
 
 - 不做多手势词汇
 - 不做 ring 适配
 - 不做 GPS 适配
 - 不做原始 IPC 协议封装
-- 不做 mirroring UI 重构
+- 不做后台常驻摄像机视觉承诺

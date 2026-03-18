@@ -9,7 +9,7 @@ class HomepageDebugReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val activity = MainActivity.activeInstance
-        if (activity == null) {
+        if (activity == null || !activity.canHandleDebugCommands()) {
             setResultCode(2)
             setResultData("homepage-unavailable")
             Log.w(TAG, "Received homepage debug command without active homepage")

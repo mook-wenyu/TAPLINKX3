@@ -16,7 +16,7 @@
 
 当前首页还实现了一个可选无障碍模式状态机：默认以 `native-only` 运行；只有在服务真实可用时才提升到 `accessibility-enhanced`，并在服务失活后回到诚实的恢复状态。
 
-但基于 `RayNeo X3 Pro` 官方能力文档、Mercury 样例与最新路线复核，这个单屏首页现在只应视为临时过渡切片；对 X3 Pro 用户可见主界面，下一步应优先升级为原生合目双屏壳层。
+基于 `RayNeo X3 Pro` 官方能力文档、Mercury 样例与最新路线复核，首页已经迁移到原生合目双屏壳层；当前它更适合作为状态入口和内部调试宿主，而不是继续扩张为多能力控制台。
 
 同时也要明确：摄像机视觉手势仍然是北极星目标，但在标准第三方 Android app 上，后台摄像头与 camera foreground service 仍受平台强约束，所以当前近期轨道不会直接把“长期后台常驻摄像机视觉”当成已可交付主线。
 
@@ -49,10 +49,10 @@
 
 ## 下一步
 
-1. 在真机上审计首批目标 App 的 accessibility tree、focusability 与 activation 质量。
-2. 基于审计结果决定是否真的需要 `FocusTracker / RecyclerViewFocusTracker`，而不是先把 vendor 焦点体系并入主线。
-3. 首页入口优先收敛为单个无障碍服务状态卡，而不是提前扩张到多个系统能力开关。
-4. 在完成审计前，不扩张到 `RingIPCHelper`、原始 `IRemoteService` 消息协议、多手势词汇、相机 provider、悬浮窗主开关或白名单深适配实现。
+1. 先在真机上运行 `Task 15` 的前台相机可行性探针，验证前台取流、短时稳定性和手是否真的进入画面。
+2. 将目标 App 审计继续作为并行证据轨道，而不是阻塞 camera feasibility spike 的硬门槛。
+3. 基于相机探针和 App 审计的双证据，再决定是否真的需要 `FocusTracker / RecyclerViewFocusTracker` 或后续单手势识别切片。
+4. 在前台相机可行性未验证前，不扩张到后台常驻宣称、MediaPipe 集成、多手势词汇、悬浮窗主开关或白名单深适配实现。
 5. 无障碍服务当前不再作为量产启用链默认主路径，而作为增强层保留；量产替代方案优先级为：`enhancement-only` > `OEM/预装` > `手机伴生端` > `ADB仅开发用`。
 
 审计基线与支持分层规则见：`docs/app-audit.md`。

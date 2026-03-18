@@ -245,3 +245,34 @@ We have not yet demonstrated, with temple gestures only, that a user can:
 - `Homepage -> Settings` is verified.
 - `App remains alive and continues semantic assistance inside Settings` is disproven under the current device/system behavior.
 - The enablement problem is now partially architectural/platform-level, not just a missing focus rule.
+
+## 2026-03-19 - Camera feasibility spike preflight (not yet device-verified)
+
+### What changed before the next device round
+
+- Added a foreground-only binocular camera probe activity:
+  - `app/src/main/java/dev/wenyu/semanticcontrol/app/CameraFeasibilityActivity.kt`
+- Added a pure session tracker for first-frame latency, analyzed-frame count, and error reporting:
+  - `app/src/main/java/dev/wenyu/semanticcontrol/feature/camera/CameraFeasibilitySessionTracker.kt`
+- Added an internal homepage debug command to launch the probe without changing the user-facing homepage CTA:
+  - `app/src/main/java/dev/wenyu/semanticcontrol/app/HomepageDebugCommandRouter.kt`
+- Added `CAMERA` manifest permission for the spike host activity only.
+
+### Commands prepared for the next device round
+
+```bash
+adb shell am broadcast --receiver-foreground \
+  -n dev.wenyu.semanticcontrol.debug/dev.wenyu.semanticcontrol.app.HomepageDebugReceiver \
+  -a dev.wenyu.semanticcontrol.debug.ACTION_HOMEPAGE_COMMAND \
+  --es command open-camera-probe
+```
+
+```bash
+adb shell pm grant dev.wenyu.semanticcontrol.debug android.permission.CAMERA
+```
+
+### Important note
+
+- These commands were prepared after the code spike, but they are **not yet verified on device**.
+- Do not treat this section as evidence that camera access already works; it only records the exact preflight path for the next session.
+- During this session, `adb kill-server && adb start-server && adb devices -l` still returned **no connected devices**, so the probe could not be run on hardware yet.

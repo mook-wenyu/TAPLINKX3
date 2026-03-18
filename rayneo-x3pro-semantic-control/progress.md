@@ -20,7 +20,7 @@
 - Bootstrapped Mercury through an internal runtime wrapper and added the RayNeo manifest handshake.
 - Added a minimal `TouchDispatcherX3 + CommonTouchCallback` input adapter that maps into existing semantic actions.
 - Added unit tests for the touch semantic bridge and kept the full build green.
-- Synced the implementation plan and launcher copy to the post-TouchDispatcher state so the next round is clearly app audit plus the `FocusTracker` decision, not more feature growth.
+- Initially synced the implementation plan toward an app-audit-first sequence after the TouchDispatcher spike; later evidence showed this ordering had drifted away from the north-star camera question and required correction.
 - Added `docs/app-audit.md` to define the first-wave audit rubric, target app categories, support tiers, and FocusTracker decision gate.
 - Added pure audit tiering types plus unit tests so `Generic`, `WhitelistCandidate`, and `Unsupported` can be derived consistently from tree, focusability, and activation signals.
 - Added an ADB-driven semantic debug bridge so device-side audits can trigger `dump-root`, `focus-next`, `focus-previous`, and `activate-focused` from the shell.
@@ -39,4 +39,9 @@
 - Broke the replacement strategy into explicit next tasks: optional accessibility mode state machine, OEM/preinstall feasibility track, and a tightly scoped companion-phone exploration track.
 - Implemented the optional accessibility mode state machine so the homepage now persists `native-only` vs `accessibility-enhanced`, upgrades when the service is truly connected, and falls back to an honest recovery state when enhancement is unavailable.
 - Reduced the camera-vision next step to a strict feasibility spike: foreground camera availability, frame stability, and hand-in-frame usefulness only.
-- Next: audit target apps before deciding whether vendor focus helpers are actually needed.
+- Corrected the plan drift: target-app audit remains important, but no longer blocks the next north-star proof task.
+- Added a foreground-only binocular camera probe activity, keeping the homepage product surface unchanged while creating a real host for `Task 15` device validation.
+- Added a unit-tested camera feasibility session tracker so first-frame latency, analyzed frame count, and error states are recorded without tangling Android camera APIs into pure reporting logic.
+- Added an internal homepage debug command to launch the camera probe without expanding the user-facing homepage CTA surface.
+- Confirmed that the current session could not run device validation because `adb devices -l` still returned no connected glasses after restarting the daemon.
+- Next: run the new camera probe on physical X3 Pro hardware, document frame stability and hand visibility, then decide whether app-audit or perception-pipeline follow-up should come first.

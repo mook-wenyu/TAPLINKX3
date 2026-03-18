@@ -34,6 +34,7 @@
 - [x] Audited the accessibility enable path and downgraded user-driven settings enablement from assumed path to high-risk pending validation
 - [x] Reframed the project into a north-star goal versus a realistic near-term delivery track
 - [x] Recorded that camera-vision remains the north-star route, but that standard Android background camera constraints block treating it as the immediate default implementation path
+- [x] Started a minimal foreground camera feasibility spike with a binocular probe host and unit-tested session tracking
 - [ ] Completed target app accessibility audit
 - [ ] Verified whether `FocusTracker / RecyclerViewFocusTracker` materially improve on the existing accessibility-first focus model
 - [ ] Completed real-device validation of the `TouchDispatcherX3` input spike on X3 Pro hardware
@@ -77,7 +78,7 @@
 
 - [x] Keep only one primary confirmation gesture for MVP
 - [x] Route pinch confirm into the existing focused activation path
-- [ ] Reassess whether a camera-backed gesture provider is still necessary after target-app audit and X3 Pro device validation
+- [ ] Reassess whether a camera-backed gesture provider is still necessary after the foreground camera spike and first-wave device evidence
 - [x] Add cancel and cooldown handling to the confirmation path
 - [x] Add deterministic tests for the pinch confirm controller path
 
@@ -186,12 +187,24 @@
 ## Task 15: Camera-Vision Feasibility Spike
 
 **Files:**
+- Create: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/feature/camera/CameraFeasibilitySessionTracker.kt`
+- Create: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/feature/camera/CameraFeasibilitySnapshotFormatter.kt`
+- Create: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/app/CameraFeasibilityActivity.kt`
+- Create: `rayneo-x3pro-semantic-control/app/src/main/res/layout/activity_camera_feasibility.xml`
+- Modify: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/app/HomepageDebugCommandRouter.kt`
+- Modify: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/app/MainActivity.kt`
+- Modify: `rayneo-x3pro-semantic-control/app/src/main/AndroidManifest.xml`
+- Modify: `rayneo-x3pro-semantic-control/app/src/main/res/values/strings.xml`
 - Modify: `rayneo-x3pro-semantic-control/docs/PRODUCT_STRATEGY.md`
 - Modify: `rayneo-x3pro-semantic-control/docs/IMPLEMENTATION_PLAN.md`
 - Modify: `rayneo-x3pro-semantic-control/docs/PROGRESS.md`
+- Test: `rayneo-x3pro-semantic-control/app/src/test/java/dev/wenyu/semanticcontrol/feature/camera/CameraFeasibilitySessionTrackerTest.kt`
+- Test: `rayneo-x3pro-semantic-control/app/src/test/java/dev/wenyu/semanticcontrol/app/HomepageDebugCommandRouterTest.kt`
 
-- [ ] Answer one narrow question only: can a standard third-party X3 Pro app, while foregrounded inside the current binocular shell, access a usable camera stream that actually shows the wearer’s hand well enough for a later single-gesture semantic prototype?
-- [ ] Explicitly exclude background residency, long-running camera service claims, multi-gesture vocabulary, MediaPipe integration, HUD polish, and cross-app control during the spike
+- [x] Add a foreground-only binocular camera probe host without changing the homepage product CTA surface
+- [x] Add unit-tested session tracking for opening state, first-frame latency, analyzed-frame count, and error reporting
+- [x] Keep the spike explicitly scoped away from background residency, MediaPipe integration, multi-gesture vocabulary, HUD polish, and cross-app control
+- [ ] Answer one narrow question only on physical hardware: can a standard third-party X3 Pro app, while foregrounded inside the current binocular shell, access a usable camera stream that actually shows the wearer’s hand well enough for a later single-gesture semantic prototype?
 - [ ] Define success as: public foreground camera access works, frames are lifecycle-stable for a short session, and the hand is visible enough to justify later egocentric gesture inference
 - [ ] Define failure as: camera access is blocked/fragile, hand visibility is physically unusable, or the spike only works through private/vendor-only assumptions
 - [ ] Route success to a follow-up `single-gesture foreground recognizer` spike; route failure to OEM/preload dependency escalation instead of more app-side CV work

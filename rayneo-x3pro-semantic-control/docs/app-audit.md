@@ -19,6 +19,8 @@
 
 如果这些问题没有先回答，继续加 `FocusTracker`、相机 provider、更多手势或 IPC 接入，都会变成任务漂移。
 
+补充修正：在最新路线里，`App Audit` 仍然重要，但它不再阻塞 `Task 15: Camera-Vision Feasibility Spike`。原因不是它不重要，而是当前北极星方向里最大的未证实风险已经变成“前台相机到底能不能在 X3 Pro 第三方双屏壳层里稳定工作”。因此，`App Audit` 现在作为并行证据轨道存在，用于后续 `FocusTracker` 和白名单判断，而不是作为 camera spike 的硬门槛。
+
 ## 2. 审计目标
 
 这轮审计只回答三个核心问题：

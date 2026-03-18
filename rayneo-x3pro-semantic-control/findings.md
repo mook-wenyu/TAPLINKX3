@@ -14,9 +14,13 @@
 - `MercuryAndroidSDK` looks like the X3-native input/focus/mirroring layer.
 - `RayNeoIPCSDK` looks like a service/IPC/speech/GPS/ring integration layer with string-message risk.
 - `MercuryAndroidSDK` v0.2.5 keeps the core public surface stable and adds focus-related signals, which increases confidence in a vendor-adapter-first path.
+- Android official foreground-service guidance treats `camera` as a while-in-use restricted capability, which reinforces that this project should validate foreground camera viability first rather than assume background residency is available.
+- Public RayNeo developer pages remain thin/gated; the local `MercuryAndroidSample` is still the strongest concrete camera integration reference for X3-native app shape.
 
 ## Engineering findings
 
 - Stable contracts should live outside app and service modules.
 - Gesture, semantic execution, and overlay feedback should remain loosely coupled.
 - Build verification must happen before claiming the scaffold is ready for feature work.
+- The shipped app module had no camera permission, preview surface, or frame-analysis seam before this session; the feasibility spike therefore needs a first-class but tightly scoped probe host rather than an incremental tweak.
+- `SemanticAccessibilityService.handleGestureSignal(...)`, `handleVendorMotionEvent(...)`, and `handleVendorKeyEvent(...)` currently expose future seams but are not wired end-to-end from a live producer, so the camera spike must not pretend those paths are already active.

@@ -13,4 +13,5 @@
     <string name="homepage_cta_enable_enhancement">开启增强模式</string>
     <string name="homepage_cta_review_service">查看设置</string>
     <string name="homepage_cta_check_service">去检查</string>
+    <string name="camera_probe_title">前台相机可行性探针</string>
 </resources>

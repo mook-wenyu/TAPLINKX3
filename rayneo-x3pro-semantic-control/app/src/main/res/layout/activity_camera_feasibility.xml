@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:paddingHorizontal="@dimen/homepage_screen_padding_horizontal"
+    android:paddingVertical="@dimen/homepage_screen_padding_vertical">
+
+    <TextureView
+        android:id="@+id/cameraPreview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:maxWidth="@dimen/homepage_card_max_width"
+        app:cardBackgroundColor="#CC111111"
+        app:cardCornerRadius="@dimen/homepage_card_corner_radius"
+        app:cardElevation="@dimen/homepage_card_elevation"
+        app:strokeColor="@android:color/transparent"
+        app:strokeWidth="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/homepage_card_padding">
+
+            <TextView
+                android:id="@+id/probeTitleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/homepage_title_text_size"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/probeStatusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/homepage_content_spacing"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/homepage_body_text_size"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/probeDetailText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/homepage_content_spacing"
+                android:textColor="#FFD7D7D7"
+                android:textSize="@dimen/homepage_body_text_size" />
+
+            <TextView
+                android:id="@+id/probeHintText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/homepage_content_spacing"
+                android:textColor="#FFB8C7D9"
+                android:textSize="@dimen/homepage_body_text_size" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</FrameLayout>

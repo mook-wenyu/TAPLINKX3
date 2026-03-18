@@ -33,6 +33,7 @@ class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
     private lateinit var modeStore: AccessibilityModeStore
     private var currentCtaAction = HomepageCtaAction.OpenAccessibilitySettings
     private lateinit var currentCardState: HomepageSetupCardState
+    private var isReadyForDebugCommands = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +48,13 @@ class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
 
     override fun onResume() {
         super.onResume()
+        isReadyForDebugCommands = true
         renderHomepage()
+    }
+
+    override fun onPause() {
+        isReadyForDebugCommands = false
+        super.onPause()
     }
 
     private fun initHomepageFocus() {
@@ -108,6 +115,7 @@ class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
     fun handleDebugCommand(command: HomepageDebugCommand): HomepageDebugResult {
         val router = HomepageDebugCommandRouter(
             handleTempleAction = ::handleHomepageTempleAction,
+            openCameraProbe = ::openCameraProbe,
             dumpState = ::buildHomepageSnapshot,
         )
         var result = HomepageDebugResult(success = false, message = "ui-timeout")
@@ -135,6 +143,16 @@ class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
             append(currentCtaAction.name)
         }
     }
+
+    private fun openCameraProbe(): Boolean {
+        if (CameraFeasibilityActivity.activeInstance != null) {
+            return true
+        }
+        startActivity(Intent(this, CameraFeasibilityActivity::class.java))
+        return true
+    }
+
+    internal fun canHandleDebugCommands(): Boolean = isReadyForDebugCommands
 
     private fun performCurrentAction(): Boolean {
         currentCardState.preferredModeOnPrimaryAction?.let(modeStore::write)
@@ -203,6 +221,7 @@ class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
     }
 
     override fun onDestroy() {
+        isReadyForDebugCommands = false
         if (activeInstance === this) {
             activeInstance = null
         }
