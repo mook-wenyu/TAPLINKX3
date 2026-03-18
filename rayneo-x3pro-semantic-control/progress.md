@@ -32,4 +32,5 @@
 - Migrated the homepage shell onto Mercury's mirrored activity path and added a small temple-action router for the single-card interaction model.
 - Verified the new shell compiles, passes tests, and launches on device without crashing; deeper binocular UI inspection still needs follow-up.
 - Added a homepage-specific ADB debug receiver and verified on device that homepage `click` opens accessibility settings and `double-click` exits back to the launcher.
+- Audited the accessibility enable path and downgraded user-driven settings enablement to a pending/high-risk path: homepage handoff is verified, but end-to-end settings navigation by temple gestures is still unproven.
 - Next: audit target apps before deciding whether vendor focus helpers are actually needed.

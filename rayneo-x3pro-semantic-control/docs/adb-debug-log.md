@@ -176,3 +176,27 @@ Relevant files:
 1. Keep the homepage debug receiver for device verification of the shell layer.
 2. Use the same ADB pattern on the next binocular pages before trusting temple-action behavior.
 3. Continue with target-app audit now that homepage shell startup, click, and double-click are verified.
+
+## 2026-03-18 - Accessibility enable path audit
+
+### Verified
+
+1. Homepage `click` opens Android accessibility settings on device.
+2. Homepage `double-click` exits the homepage and returns to the RayNeo launcher.
+
+### Not yet verified
+
+The full user-driven enable path inside Android accessibility settings is still unproven.
+
+We have not yet demonstrated, with temple gestures only, that a user can:
+
+1. navigate the accessibility settings list,
+2. enter the app's service detail page,
+3. switch the service on,
+4. complete any required confirmation dialogs.
+
+### Current conclusion
+
+- `Homepage -> Settings` handoff is valid.
+- `Settings -> fully enabled service by temple gestures only` remains a high-risk / pending path.
+- Product docs should no longer treat manual settings enablement as an already validated mainstream onboarding path.
