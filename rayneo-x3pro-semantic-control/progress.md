@@ -38,4 +38,5 @@
 - Converted the enablement decision into a strategy matrix: accessibility is now the default enhancement-only layer, OEM/preinstall stays as the secondary high-upside path, companion-phone enablement remains exploratory, and ADB stays dev-only.
 - Broke the replacement strategy into explicit next tasks: optional accessibility mode state machine, OEM/preinstall feasibility track, and a tightly scoped companion-phone exploration track.
 - Implemented the optional accessibility mode state machine so the homepage now persists `native-only` vs `accessibility-enhanced`, upgrades when the service is truly connected, and falls back to an honest recovery state when enhancement is unavailable.
+- Reduced the camera-vision next step to a strict feasibility spike: foreground camera availability, frame stability, and hand-in-frame usefulness only.
 - Next: audit target apps before deciding whether vendor focus helpers are actually needed.
