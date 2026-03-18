@@ -31,6 +31,7 @@
 - [x] Replaced the static homepage with a single AR-first accessibility-service setup card
 - [x] Reassessed the device path and decided the single-layout homepage is only a temporary slice for X3 Pro
 - [x] Migrated the homepage shell to `BaseMirrorActivity` with Mercury-driven binocular setup wiring
+- [x] Audited the accessibility enable path and downgraded user-driven settings enablement from assumed path to high-risk pending validation
 - [ ] Completed target app accessibility audit
 - [ ] Verified whether `FocusTracker / RecyclerViewFocusTracker` materially improve on the existing accessibility-first focus model
 - [ ] Completed real-device validation of the `TouchDispatcherX3` input spike on X3 Pro hardware
@@ -116,6 +117,19 @@
 - [x] Promote native temple gestures to the homepage interaction primary path
 - [ ] Keep accessibility as a compatibility/fallback path rather than the shell architecture driver
 - [ ] Finish deeper on-device binocular homepage verification before adding more user-visible pages
+
+## Task 10: Accessibility Enable Path Audit
+
+**Files:**
+- Modify: `rayneo-x3pro-semantic-control/docs/PRODUCT_STRATEGY.md`
+- Modify: `rayneo-x3pro-semantic-control/docs/adb-debug-log.md`
+- Modify: `rayneo-x3pro-semantic-control/docs/PROGRESS.md`
+
+- [x] Verify homepage `click` reaches Android accessibility settings on device
+- [x] Verify homepage `double-click` exits back to launcher on device
+- [x] Confirm that the full user-driven settings enable path is still unproven
+- [ ] Determine whether the system accessibility settings page itself can be operated end-to-end via temple gestures
+- [ ] If not, define the replacement enable strategy (`OEM path / companion phone / privileged integration`)
 
 ## Task 5: App Audit and Whitelist Strategy
 
