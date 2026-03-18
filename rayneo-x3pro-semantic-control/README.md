@@ -42,6 +42,8 @@
 2. 基于审计结果决定是否真的需要 `FocusTracker / RecyclerViewFocusTracker`，而不是先把 vendor 焦点体系并入主线。
 3. 在完成审计前，不扩张到 `RingIPCHelper`、原始 `IRemoteService` 消息协议、多手势词汇、相机 provider 或白名单深适配实现。
 
+审计基线与支持分层规则见：`docs/app-audit.md`。
+
 ## 构建
 
 工程是独立单模块 Gradle 项目，根目录在：`rayneo-x3pro-semantic-control/`。

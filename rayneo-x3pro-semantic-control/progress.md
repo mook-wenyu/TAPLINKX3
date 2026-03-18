@@ -21,4 +21,6 @@
 - Added a minimal `TouchDispatcherX3 + CommonTouchCallback` input adapter that maps into existing semantic actions.
 - Added unit tests for the touch semantic bridge and kept the full build green.
 - Synced the implementation plan and launcher copy to the post-TouchDispatcher state so the next round is clearly app audit plus the `FocusTracker` decision, not more feature growth.
+- Added `docs/app-audit.md` to define the first-wave audit rubric, target app categories, support tiers, and FocusTracker decision gate.
+- Added pure audit tiering types plus unit tests so `Generic`, `WhitelistCandidate`, and `Unsupported` can be derived consistently from tree, focusability, and activation signals.
 - Next: audit target apps before deciding whether vendor focus helpers are actually needed.

@@ -25,6 +25,7 @@
 - [x] Compared `MercuryAndroidSDK` v0.2.2 and v0.2.5 public API surface
 - [x] Introduced a minimal RayNeo vendor adapter boundary and Mercury bootstrap
 - [x] Implemented a minimal `TouchDispatcherX3 + CommonTouchCallback` input spike
+- [x] Added an app-audit baseline document and support-tier heuristics for the next device round
 - [ ] Completed target app accessibility audit
 - [ ] Verified whether `FocusTracker / RecyclerViewFocusTracker` materially improve on the existing accessibility-first focus model
 - [ ] Completed real-device validation of the `TouchDispatcherX3` input spike on X3 Pro hardware
@@ -88,11 +89,12 @@
 **Files:**
 - Create: `rayneo-x3pro-semantic-control/docs/app-audit.md`
 - Create: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/core/contracts/AppSupportTier.kt`
+- Test: `rayneo-x3pro-semantic-control/app/src/test/java/dev/wenyu/semanticcontrol/core/contracts/AppSupportTierTest.kt`
 
-- [ ] Define target app categories for MVP evaluation
+- [x] Define target app categories for MVP evaluation
 - [ ] Audit accessibility tree quality and action reachability
 - [ ] Tag apps as `generic`, `whitelist-candidate`, or `unsupported`
-- [ ] Document whitelist triggers and non-goals
+- [x] Document whitelist triggers and non-goals
 
 ## Task 6: RayNeo X3 Pro Vendor Adaptation Boundary
 

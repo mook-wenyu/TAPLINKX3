@@ -27,13 +27,15 @@
 - 保持 `TouchDispatcherX3` 只经由 `vendor.rayneo` 包进入主线，不改写现有语义导航模型
 - 为输入映射 bridge 增加本地单测，并通过主线单测和 `assembleDebug`
 - 同步 `docs/IMPLEMENTATION_PLAN.md` 与启动页文案，明确下一步是目标 App 审计、`FocusTracker / RecyclerViewFocusTracker` 判断与 `TouchDispatcherX3` 真机验证，而不是继续扩张新 feature
+- 新增 `docs/app-audit.md`，固化第一轮目标 App 类别、审计维度、支持分层与 `FocusTracker` 试验门槛
+- 新增 `AppSupportTier` / `AppAuditSnapshot` 纯领域类型与单测，把 `generic / whitelist-candidate / unsupported` 判断收敛为可测试规则
 - 写入产品策略、实施计划和项目 README
 
 ### 未完成
 
 - App 审计与白名单策略
 - 是否需要 `FocusTracker / RecyclerViewFocusTracker` 的真机判断
-- 真实相机手势 provider 接入
+- 相机 hand-tracking provider 是否仍有必要的复盘判断
 
 说明：当前 feature work 已完成到 MVP 所需的确认链路、Mercury bootstrap 和 `TouchDispatcherX3` 输入 spike。下一步不应继续扩张输入 feature，而应先做 App 审计，并判断是否真的需要 vendor 焦点辅助。
 
