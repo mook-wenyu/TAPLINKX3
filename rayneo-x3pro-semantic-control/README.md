@@ -4,16 +4,21 @@
 
 当前产品方向：
 
-- 短期：`X3-native binocular UI + temple gestures`，`Accessibility` 作为增强层
+- 北极星目标：`无外设 + 基于摄像机视觉 + 第三方后台常驻 + 用手势控制第三方应用`
+- 当前可交付轨道：`X3-native binocular UI + temple gestures`，`Accessibility` 作为增强层
 - 长期：`全局语义控制 + 白名单 App 深适配`
 
 当前版本已经完成单模块工程骨架、语义焦点遍历、`pinch -> activate focused target` 的最小确认适配层、第一版 `RayNeo vendor adapter boundary + Mercury bootstrap`，以及 `TouchDispatcherX3` 到内部语义动作的最小输入 spike。
+
+这些能力不等于已经实现了北极星目标；它们更准确地说，是在当前 `RayNeo X3 Pro` 平台约束下，为未来摄像机视觉 / 后台常驻 / 跨第三方控制铺的设备壳层与调试底座。
 
 当前首页也已经从静态说明页收敛为一个单卡 AR 引导页，只围绕无障碍服务状态与设置跳转展开，不提前暴露悬浮窗主开关。
 
 当前首页还实现了一个可选无障碍模式状态机：默认以 `native-only` 运行；只有在服务真实可用时才提升到 `accessibility-enhanced`，并在服务失活后回到诚实的恢复状态。
 
 但基于 `RayNeo X3 Pro` 官方能力文档、Mercury 样例与最新路线复核，这个单屏首页现在只应视为临时过渡切片；对 X3 Pro 用户可见主界面，下一步应优先升级为原生合目双屏壳层。
+
+同时也要明确：摄像机视觉手势仍然是北极星目标，但在标准第三方 Android app 上，后台摄像头与 camera foreground service 仍受平台强约束，所以当前近期轨道不会直接把“长期后台常驻摄像机视觉”当成已可交付主线。
 
 最新的本地 SDK 逆向分析表明：
 
