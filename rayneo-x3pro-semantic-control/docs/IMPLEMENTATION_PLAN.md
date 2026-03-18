@@ -130,6 +130,7 @@
 - [x] Confirm that the full user-driven settings enable path is still unproven
 - [ ] Determine whether the system accessibility settings page itself can be operated end-to-end via temple gestures
 - [ ] If not, define the replacement enable strategy (`OEM path / companion phone / privileged integration`)
+- [ ] Expand settings-page semantic snapshots so temple-driven enablement can be audited step by step instead of inferred from coarse root data
 
 ## Task 5: App Audit and Whitelist Strategy
 
