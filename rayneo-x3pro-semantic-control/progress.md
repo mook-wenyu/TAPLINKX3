@@ -34,4 +34,5 @@
 - Added a homepage-specific ADB debug receiver and verified on device that homepage `click` opens accessibility settings and `double-click` exits back to the launcher.
 - Audited the accessibility enable path and downgraded user-driven settings enablement to a pending/high-risk path: homepage handoff is verified, but end-to-end settings navigation by temple gestures is still unproven.
 - Refined the next step for enable-path validation: expand settings-page semantic snapshot detail before making stronger claims about temple-only enablement.
+- Verified a stronger blocker on device: switching to Android Settings can force-stop the app process, which breaks any in-process semantic assist path during the enable flow.
 - Next: audit target apps before deciding whether vendor focus helpers are actually needed.

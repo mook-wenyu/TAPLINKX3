@@ -131,6 +131,7 @@
 - [ ] Determine whether the system accessibility settings page itself can be operated end-to-end via temple gestures
 - [ ] If not, define the replacement enable strategy (`OEM path / companion phone / privileged integration`)
 - [ ] Expand settings-page semantic snapshots so temple-driven enablement can be audited step by step instead of inferred from coarse root data
+- [x] Confirm that switching to Android Settings can force-stop the third-party app process on X3 Pro, breaking any in-process semantic assist path
 
 ## Task 5: App Audit and Whitelist Strategy
 

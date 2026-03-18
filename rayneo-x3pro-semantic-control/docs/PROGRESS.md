@@ -41,6 +41,7 @@
 - 为首页补充 ADB 调试入口，并完成 `click -> 无障碍设置页`、`double-click -> 返回 Launcher` 的真机验证
 - 完成无障碍启用链阶段性审计：已确认“首页 -> 系统无障碍设置页”可达，但尚不能证明用户能仅靠镜腿手势完成系统设置内的完整开启流程
 - 明确下一步不是再猜启用链，而是扩展 settings 页语义快照细节，用更细粒度证据验证镜腿端到端可操作性
+- 真机复测表明：当顶部 Activity 切到 `com.android.settings` 后，Mercury/系统会强制停掉第三方应用进程，导致 `SemanticAccessibilityService` 失活；因此当前应用内语义辅助无法继续陪跑系统设置流程
 - 写入产品策略、实施计划和项目 README
 
 ### 未完成
@@ -49,6 +50,7 @@
 - 是否需要 `FocusTracker / RecyclerViewFocusTracker` 的真机判断
 - 相机 hand-tracking provider 是否仍有必要的复盘判断
 - 系统无障碍设置页的端到端镜腿可操作性验证
+- 替代无障碍启用链方案评估（OEM / 伴生端 / 预装）
 
 说明：当前 feature work 已完成到 MVP 所需的确认链路、Mercury bootstrap 和 `TouchDispatcherX3` 输入 spike。下一步不应继续扩张输入 feature，而应先做 App 审计，并判断是否真的需要 vendor 焦点辅助。
 

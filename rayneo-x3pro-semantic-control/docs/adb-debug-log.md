@@ -214,3 +214,34 @@ We have not yet demonstrated, with temple gestures only, that a user can:
 - The missing proof is no longer “can we open settings?” — that is already solved.
 - The missing proof is “can we observe and complete the settings flow with enough fidelity to trust temple-only enablement?”
 - The smallest justified next step is richer semantic snapshot detail for settings-page audits, not a brand-new debug subsystem.
+
+## 2026-03-18 - Settings-side process death finding
+
+### What was tested
+
+1. Re-enable the accessibility service via ADB and confirm it is bound.
+2. Launch the app homepage and wait until `Semantic accessibility service connected` appears.
+3. Open Android Settings from the app flow.
+4. Observe process/activity logs while attempting to continue semantic inspection.
+
+### What happened
+
+- The service did bind correctly before entering Settings.
+- After the top activity switched to `com.android.settings`, Mercury/system logs showed:
+  - `forceStopPackage dev.wenyu.semanticcontrol.debug`
+  - `Force stopping dev.wenyu.semanticcontrol.debug`
+  - the app process was killed,
+  - then later restarted only when explicitly relaunched.
+- Once the process died, `SemanticDebugReceiver` returned `service-unavailable`, because the service was no longer active in-process.
+
+### Interpretation
+
+- This is a stronger blocker than coarse settings-page snapshots alone.
+- Even if the settings tree itself is readable, the current third-party app process does not remain alive reliably after switching into system Settings.
+- Therefore, the existing architecture cannot assume that the app will keep assisting the user throughout the Settings enable flow.
+
+### Updated conclusion
+
+- `Homepage -> Settings` is verified.
+- `App remains alive and continues semantic assistance inside Settings` is disproven under the current device/system behavior.
+- The enablement problem is now partially architectural/platform-level, not just a missing focus rule.
