@@ -33,6 +33,8 @@
 - 完成第一轮真机调试，并在 `docs/adb-debug-log.md` 记录成功路径、失败路径、可复用命令与系统设置首页的首个审计样本
 - 修复一个真机暴露出来的焦点遍历问题：不再把 `isFocusable` 误判为支持 `ACTION_FOCUS`
 - 完成首页入口产品决策收敛：当前只推荐一个围绕无障碍服务的主状态卡，不建议提前加入悬浮窗主开关
+- 将首页从静态说明页替换为单卡 AR 引导页，加入 `未启用 / 已开启 / 需检查` 三态与无障碍设置跳转
+- 为首页服务状态解析新增本地单测，并通过主线单测与 `assembleDebug`
 - 写入产品策略、实施计划和项目 README
 
 ### 未完成
@@ -40,7 +42,6 @@
 - App 审计与白名单策略
 - 是否需要 `FocusTracker / RecyclerViewFocusTracker` 的真机判断
 - 相机 hand-tracking provider 是否仍有必要的复盘判断
-- 首页单卡引导与服务状态页实现
 
 说明：当前 feature work 已完成到 MVP 所需的确认链路、Mercury bootstrap 和 `TouchDispatcherX3` 输入 spike。下一步不应继续扩张输入 feature，而应先做 App 审计，并判断是否真的需要 vendor 焦点辅助。
 

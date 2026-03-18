@@ -1,60 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:paddingHorizontal="@dimen/homepage_screen_padding_horizontal"
+    android:paddingVertical="@dimen/homepage_screen_padding_vertical">
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/setupCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:layout_gravity="center"
+        android:maxWidth="@dimen/homepage_card_max_width"
+        app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+        app:cardCornerRadius="@dimen/homepage_card_corner_radius"
+        app:cardElevation="@dimen/homepage_card_elevation"
+        app:strokeColor="?attr/colorOutlineVariant"
+        app:strokeWidth="@dimen/homepage_card_stroke_width">
 
-        <TextView
-            android:id="@+id/titleText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall" />
+            android:orientation="vertical"
+            android:padding="@dimen/homepage_card_padding">
 
-        <TextView
-            android:id="@+id/subtitleText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/launcher_summary"
-            android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+            <TextView
+                android:id="@+id/titleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:textAlignment="viewStart"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="@dimen/homepage_title_text_size"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/architectureHeader"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/architecture_header"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/homepage_content_spacing"
+                android:gravity="start"
+                android:textAlignment="viewStart"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="@dimen/homepage_body_text_size"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/architectureText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/architecture_body"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+            <TextView
+                android:id="@+id/helperText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/homepage_content_spacing"
+                android:gravity="start"
+                android:textAlignment="viewStart"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="@dimen/homepage_body_text_size" />
 
-        <TextView
-            android:id="@+id/nextStepsHeader"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/next_steps_header"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/primaryButton"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/homepage_button_margin_top"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minHeight="@dimen/homepage_button_min_height"
+                android:textSize="@dimen/homepage_body_text_size" />
 
-        <TextView
-            android:id="@+id/nextStepsText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/next_steps_body"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
-
-    </LinearLayout>
-</ScrollView>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</FrameLayout>

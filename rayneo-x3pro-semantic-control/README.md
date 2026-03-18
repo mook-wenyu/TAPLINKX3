@@ -9,6 +9,8 @@
 
 当前版本已经完成单模块工程骨架、语义焦点遍历、`pinch -> activate focused target` 的最小确认适配层、第一版 `RayNeo vendor adapter boundary + Mercury bootstrap`，以及 `TouchDispatcherX3` 到内部语义动作的最小输入 spike。
 
+当前首页也已经从静态说明页收敛为一个单卡 AR 引导页，只围绕无障碍服务状态与设置跳转展开，不提前暴露悬浮窗主开关。
+
 最新的本地 SDK 逆向分析表明：
 
 - `MercuryAndroidSDK` 更接近 X3 Pro 的输入 / 焦点 / 镜像 UI 适配层。

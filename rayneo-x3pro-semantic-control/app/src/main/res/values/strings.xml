@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Semantic Control</string>
-    <string name="launcher_summary">当前版本已完成单 app 模块骨架、语义焦点遍历、安全激活、pinch-confirm、RayNeo vendor boundary、Mercury bootstrap 与 TouchDispatcherX3 最小输入 spike。</string>
-    <string name="architecture_header">当前结构</string>
-    <string name="architecture_body">单 app 模块 + 包级分层：app、core.contracts、feature.gesture、feature.overlay、feature.semantic、vendor.rayneo。</string>
-    <string name="next_steps_header">下一步</string>
-    <string name="next_steps_body">1. 在真机上审计首批目标 App 的 accessibility tree、focusability 与 activation 质量。 2. 决定是否真的需要 FocusTracker / RecyclerViewFocusTracker。 3. 验证 TouchDispatcherX3 输入 spike 的真机稳定性。 4. 在完成审计前，不扩张相机 provider、IPC 或更多手势词汇。</string>
     <string name="a11y_service_label">Semantic Control Service</string>
     <string name="a11y_service_description">基于 Accessibility 的语义控制服务，当前已接入焦点遍历、安全激活与 RayNeo 最小输入适配。</string>
+    <string name="homepage_title">开启语义控制</string>
+    <string name="homepage_status_not_enabled">未启用</string>
+    <string name="homepage_status_enabled">已开启</string>
+    <string name="homepage_status_needs_attention">需检查</string>
+    <string name="homepage_helper_not_enabled">开启无障碍服务后，即可使用语义控制。</string>
+    <string name="homepage_helper_enabled">服务已就绪，现在可以开始使用。</string>
+    <string name="homepage_helper_needs_attention">服务已开启，但当前未连接，请前往设置检查。</string>
+    <string name="homepage_cta_enable_service">去开启</string>
+    <string name="homepage_cta_review_service">查看设置</string>
+    <string name="homepage_cta_check_service">去检查</string>
 </resources>
