@@ -10,6 +10,9 @@ import dev.wenyu.semanticcontrol.core.contracts.SemanticAction
 import dev.wenyu.semanticcontrol.feature.gesture.PinchConfirmController
 import dev.wenyu.semanticcontrol.feature.overlay.FocusHudOverlayController
 import dev.wenyu.semanticcontrol.feature.overlay.FocusHudState
+import dev.wenyu.semanticcontrol.feature.semantic.debug.SemanticDebugCommand
+import dev.wenyu.semanticcontrol.feature.semantic.debug.SemanticDebugCommandRouter
+import dev.wenyu.semanticcontrol.feature.semantic.debug.SemanticDebugResult
 import dev.wenyu.semanticcontrol.vendor.rayneo.RayNeoVendorAdapter
 import dev.wenyu.semanticcontrol.vendor.rayneo.VendorInputAdapter
 
@@ -22,6 +25,7 @@ class SemanticAccessibilityService : AccessibilityService() {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+        activeInstance = this
         navigator = SemanticNavigator(this)
         overlayController = FocusHudOverlayController(this)
         pinchConfirmController = PinchConfirmController(
@@ -59,12 +63,47 @@ class SemanticAccessibilityService : AccessibilityService() {
         vendorInputAdapter.onKeyEvent(event)
     }
 
+    internal fun handleDebugCommand(command: SemanticDebugCommand): SemanticDebugResult {
+        val router = SemanticDebugCommandRouter(
+            onSemanticAction = navigator::perform,
+            dumpSnapshot = ::buildDebugSnapshot,
+        )
+        return router.handle(command)
+    }
+
+    private fun buildDebugSnapshot(): String {
+        val root = rootInActiveWindow ?: return "root=null"
+        val accessibilityFocus = root.findFocus(android.view.accessibility.AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)
+        val inputFocus = root.findFocus(android.view.accessibility.AccessibilityNodeInfo.FOCUS_INPUT)
+        return buildString {
+            append("root=")
+            append(root.packageName ?: "null")
+            append("/")
+            append(root.className ?: "null")
+            append(";a11yFocus=")
+            append(accessibilityFocus?.className ?: "null")
+            append(":")
+            append(accessibilityFocus?.text ?: accessibilityFocus?.contentDescription ?: "null")
+            append(";inputFocus=")
+            append(inputFocus?.className ?: "null")
+            append(":")
+            append(inputFocus?.text ?: inputFocus?.contentDescription ?: "null")
+        }
+    }
+
     override fun onDestroy() {
+        if (activeInstance === this) {
+            activeInstance = null
+        }
         overlayController.detach()
         super.onDestroy()
     }
 
-    private companion object {
+    companion object {
         const val TAG = "SemanticA11yService"
+
+        @Volatile
+        var activeInstance: SemanticAccessibilityService? = null
+            private set
     }
 }
