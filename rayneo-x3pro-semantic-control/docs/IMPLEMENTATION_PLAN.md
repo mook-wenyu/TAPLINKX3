@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build an independent Android-native project for RayNeo X3 Pro that starts with accessibility-first semantic control and evolves toward global semantic control with whitelisted app deep adaptation.
+**Goal:** Build an independent Android-native project for RayNeo X3 Pro that preserves the north-star of camera-vision, no-peripheral, background-resident third-party gesture control, while shipping a realistic near-term track based on binocular shell, native temple gestures, and optional accessibility enhancement.
 
-**Architecture:** Use a single Android app module with package-level layering for contracts, gesture, semantic execution, and focus HUD feedback. Keep the MVP centered on semantic focus traversal and explicit pinch confirmation instead of spatial free-click, and avoid premature Gradle modularization.
+**Architecture:** Use a single Android app module with package-level layering for contracts, gesture, semantic execution, and focus HUD feedback. Treat the current X3-native shell and accessibility-enhancement work as enabling infrastructure, not the final interaction model, and keep future camera-vision / background-resident control paths decoupled from today’s shell logic.
 
 **Tech Stack:** Kotlin, Android SDK 36, AccessibilityService, Foreground Service (future), MediaPipe-compatible gesture abstraction, Material 3, Coroutines.
 
@@ -32,6 +32,8 @@
 - [x] Reassessed the device path and decided the single-layout homepage is only a temporary slice for X3 Pro
 - [x] Migrated the homepage shell to `BaseMirrorActivity` with Mercury-driven binocular setup wiring
 - [x] Audited the accessibility enable path and downgraded user-driven settings enablement from assumed path to high-risk pending validation
+- [x] Reframed the project into a north-star goal versus a realistic near-term delivery track
+- [x] Recorded that camera-vision remains the north-star route, but that standard Android background camera constraints block treating it as the immediate default implementation path
 - [ ] Completed target app accessibility audit
 - [ ] Verified whether `FocusTracker / RecyclerViewFocusTracker` materially improve on the existing accessibility-first focus model
 - [ ] Completed real-device validation of the `TouchDispatcherX3` input spike on X3 Pro hardware
