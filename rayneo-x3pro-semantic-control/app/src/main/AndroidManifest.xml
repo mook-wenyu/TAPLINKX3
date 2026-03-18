@@ -31,6 +31,14 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name="dev.wenyu.semanticcontrol.app.HomepageDebugReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="dev.wenyu.semanticcontrol.debug.ACTION_HOMEPAGE_COMMAND" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name="dev.wenyu.semanticcontrol.feature.semantic.SemanticAccessibilityService"
             android:description="@string/a11y_service_description"

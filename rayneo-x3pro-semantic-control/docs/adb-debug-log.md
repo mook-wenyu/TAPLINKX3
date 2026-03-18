@@ -115,3 +115,64 @@ adb shell am broadcast \
 1. Audit a more standard list-detail screen where `ACTION_FOCUS` may be better supported.
 2. Audit a form/search screen to compare focus and activation behavior.
 3. If multiple high-value screens keep showing `tree=Good` but `focusability=Poor`, then evaluate `FocusTracker / RecyclerViewFocusTracker` with the same ADB debug harness.
+
+## 2026-03-18 - Binocular homepage shell verification
+
+### What changed before verification
+
+- The homepage shell moved onto Mercury's mirrored activity path.
+- A lightweight homepage debug receiver was added so ADB can simulate `click` and `double-click` without waiting for manual temple input.
+
+Relevant files:
+
+- `app/src/main/java/dev/wenyu/semanticcontrol/app/MainActivity.kt`
+- `app/src/main/java/dev/wenyu/semanticcontrol/app/HomepageTempleActionRouter.kt`
+- `app/src/main/java/dev/wenyu/semanticcontrol/app/HomepageDebugCommandRouter.kt`
+- `app/src/main/java/dev/wenyu/semanticcontrol/app/HomepageDebugReceiver.kt`
+
+### Verified behavior
+
+1. **Homepage launch is stable enough for continued work**
+   - The mirrored homepage launches on device without `AndroidRuntime` / `FATAL` crash logs.
+2. **Homepage click path works**
+   - ADB command:
+     ```bash
+     adb shell am broadcast --receiver-foreground \
+       -n dev.wenyu.semanticcontrol.debug/dev.wenyu.semanticcontrol.app.HomepageDebugReceiver \
+       -a dev.wenyu.semanticcontrol.debug.ACTION_HOMEPAGE_COMMAND \
+       --es command click
+     ```
+   - Result: `click:ok`
+   - Foreground activity changed to `com.android.settings/.Settings$AccessibilitySettingsActivity`
+3. **Homepage double-click exit works**
+   - ADB command:
+     ```bash
+     adb shell am broadcast --receiver-foreground \
+       -n dev.wenyu.semanticcontrol.debug/dev.wenyu.semanticcontrol.app.HomepageDebugReceiver \
+       -a dev.wenyu.semanticcontrol.debug.ACTION_HOMEPAGE_COMMAND \
+       --es command double-click
+     ```
+   - Result: `double-click:ok`
+   - Foreground activity returned to `com.ffalconxr.mercury.launcher/.home.LauncherHomeActivity`
+
+### Important findings
+
+1. **The previous inability to verify homepage temple actions was a tooling gap, not a product failure**
+   - The original accessibility-service debug bridge cannot validate homepage actions because it targets `SemanticAccessibilityService`, not the homepage activity.
+   - A separate homepage debug receiver solved this.
+2. **Homepage `click` and `double-click` behavior now have direct device evidence**
+   - We no longer have to infer these paths from code alone.
+3. **`uiautomator dump` remains weak evidence for mirrored UI inspection**
+   - For the mirrored homepage shell, it still does not give a reliable binocular-specific view of the page.
+   - It is usable for coarse presence checks, but not enough for left/right mirrored validation.
+
+### Notes / caveats
+
+- During verification, a `WindowManager` log mentioned `WRITE_SECURE_SETTINGS` while the launcher took focus back. This did not block the homepage double-click exit path and did not appear as an app crash.
+- Earlier `app died, no saved state` lines observed around install/replace were associated with package replacement and process restart, not a reproducible homepage runtime crash.
+
+### Updated next recommended device steps
+
+1. Keep the homepage debug receiver for device verification of the shell layer.
+2. Use the same ADB pattern on the next binocular pages before trusting temple-action behavior.
+3. Continue with target-app audit now that homepage shell startup, click, and double-click are verified.

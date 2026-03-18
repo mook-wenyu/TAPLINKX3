@@ -31,4 +31,5 @@
 - Reassessed the device route using the local capability PDF, Mercury sample, and external evidence: for X3 Pro, binocular mirrored UI plus temple gestures should drive the user-visible shell, and the current single-layout homepage should be treated as temporary.
 - Migrated the homepage shell onto Mercury's mirrored activity path and added a small temple-action router for the single-card interaction model.
 - Verified the new shell compiles, passes tests, and launches on device without crashing; deeper binocular UI inspection still needs follow-up.
+- Added a homepage-specific ADB debug receiver and verified on device that homepage `click` opens accessibility settings and `double-click` exits back to the launcher.
 - Next: audit target apps before deciding whether vendor focus helpers are actually needed.

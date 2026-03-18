@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +18,8 @@ import com.ffalcon.mercury.android.sdk.ui.util.FocusHolder
 import com.ffalcon.mercury.android.sdk.ui.util.FocusInfo
 import dev.wenyu.semanticcontrol.app.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
 
@@ -31,6 +34,7 @@ class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        activeInstance = this
         initHomepageFocus()
         initTempleActions()
         renderHomepage()
@@ -96,9 +100,27 @@ class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
         return actionRouter.handle(mapped)
     }
 
+    fun handleDebugCommand(command: HomepageDebugCommand): HomepageDebugResult {
+        val router = HomepageDebugCommandRouter(::handleHomepageTempleAction)
+        var result = HomepageDebugResult(success = false, message = "ui-timeout")
+        val latch = CountDownLatch(1)
+        runOnUiThread {
+            result = router.handle(command)
+            Log.i(TAG, "Homepage debug command ${command.wireValue} -> ${result.message}")
+            latch.countDown()
+        }
+        val completed = latch.await(2, TimeUnit.SECONDS)
+        return if (completed) result else HomepageDebugResult(false, "ui-timeout")
+    }
+
+    private fun handleHomepageTempleAction(action: HomepageTempleAction): Boolean {
+        return actionRouter.handle(action)
+    }
+
     private fun performCurrentAction(): Boolean {
         return when (currentCtaAction) {
             HomepageCtaAction.OpenAccessibilitySettings -> {
+                Log.i(TAG, "Opening accessibility settings from homepage")
                 startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
                 true
             }
@@ -146,8 +168,20 @@ class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
         return enabledServices.split(':').any { it == targetService }
     }
 
-    private companion object {
+    companion object {
+        const val TAG = "HomepageMainActivity"
         const val ACCESSIBILITY_SERVICE_CLASS_NAME =
             "dev.wenyu.semanticcontrol.feature.semantic.SemanticAccessibilityService"
+
+        @Volatile
+        var activeInstance: MainActivity? = null
+            private set
+    }
+
+    override fun onDestroy() {
+        if (activeInstance === this) {
+            activeInstance = null
+        }
+        super.onDestroy()
     }
 }
