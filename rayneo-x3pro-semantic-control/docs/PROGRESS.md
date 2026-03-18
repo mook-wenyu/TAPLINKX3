@@ -43,6 +43,7 @@
 - 明确下一步不是再猜启用链，而是扩展 settings 页语义快照细节，用更细粒度证据验证镜腿端到端可操作性
 - 真机复测表明：当顶部 Activity 切到 `com.android.settings` 后，Mercury/系统会强制停掉第三方应用进程，导致 `SemanticAccessibilityService` 失活；因此当前应用内语义辅助无法继续陪跑系统设置流程
 - 完成替代启用链策略矩阵：当前默认路线调整为 `Accessibility = enhancement-only`，OEM/预装维持为次级高价值路线，手机伴生端仅保留为探索项
+- 已将替代启用链策略翻译成明确后续任务：可选无障碍模式状态机、OEM/预装可行性跟踪、手机伴生端探索边界
 - 写入产品策略、实施计划和项目 README
 
 ### 未完成

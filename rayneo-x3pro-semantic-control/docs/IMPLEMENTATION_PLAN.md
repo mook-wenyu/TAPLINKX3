@@ -145,7 +145,41 @@
 - [x] Set `Accessibility = enhancement-only` as the current product default
 - [x] Keep OEM/system integration as the secondary strategic track
 - [x] Keep companion phone as exploratory only until it proves it can materially change enablement outcomes
-- [ ] Translate this strategy into concrete follow-up implementation tickets
+- [x] Translate this strategy into concrete follow-up implementation tickets
+
+## Task 12: Optional Accessibility Mode State Machine
+
+**Files:**
+- Modify: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/app/...`
+- Modify: `rayneo-x3pro-semantic-control/docs/PRODUCT_STRATEGY.md`
+- Test: `rayneo-x3pro-semantic-control/app/src/test/...`
+
+- [ ] Persist whether the user is in `native-only` or `accessibility-enhanced` mode
+- [ ] Treat accessibility as optional enhancement, not a blocking bootstrap prerequisite
+- [ ] Recover cleanly after returning from Settings or after process death
+- [ ] Keep homepage messaging honest when accessibility is unavailable or unenabled
+- [ ] Add deterministic tests for mode transitions and relaunch recovery
+
+## Task 13: OEM / Preinstall Feasibility Track
+
+**Files:**
+- Modify: `rayneo-x3pro-semantic-control/docs/RAYNEO_SDK_ADAPTATION.md`
+- Modify: `rayneo-x3pro-semantic-control/docs/PRODUCT_STRATEGY.md`
+- Create: `rayneo-x3pro-semantic-control/docs/oem-enable-path.md`
+
+- [ ] Document the minimum OEM/system capabilities needed to replace the broken Settings bootstrap path
+- [ ] Separate public SDK evidence from privileged/preload assumptions
+- [ ] Define the exact vendor questions required before spending engineering effort on OEM integration
+
+## Task 14: Companion Phone Exploratory Track
+
+**Files:**
+- Modify: `rayneo-x3pro-semantic-control/docs/PRODUCT_STRATEGY.md`
+- Modify: `rayneo-x3pro-semantic-control/docs/IMPLEMENTATION_PLAN.md`
+
+- [ ] Define a narrow success criterion for companion-phone assistance
+- [ ] Limit companion scope to onboarding support unless it proves it can materially improve enablement outcomes
+- [ ] Avoid promoting companion-phone flow to the mainline product path without device-side evidence
 
 ## Task 5: App Audit and Whitelist Strategy
 
