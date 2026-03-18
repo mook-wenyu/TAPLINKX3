@@ -153,6 +153,8 @@
 3. 量产候选 B：手机伴生端完成启用链
 4. 兼容方案：保留 accessibility 作为增强层，而非唯一可达主路径
 
+当前新增的设备证据表明，风险不仅在于 Settings 页是否适合镜腿导航，还在于当顶部 Activity 切到 `com.android.settings` 后，Mercury/系统会强制停掉当前第三方进程，导致本应用与 `SemanticAccessibilityService` 失活。只要这个系统行为成立，就不能把“进入系统设置后继续由本应用完成语义辅助”当成可靠主路径。
+
 ## 9. 成功标准
 
 MVP 的成功不是“识别了多少种手势”，而是：
