@@ -40,7 +40,8 @@
 
 1. 在真机上审计首批目标 App 的 accessibility tree、focusability 与 activation 质量。
 2. 基于审计结果决定是否真的需要 `FocusTracker / RecyclerViewFocusTracker`，而不是先把 vendor 焦点体系并入主线。
-3. 在完成审计前，不扩张到 `RingIPCHelper`、原始 `IRemoteService` 消息协议、多手势词汇、相机 provider 或白名单深适配实现。
+3. 首页入口优先收敛为单个无障碍服务状态卡，而不是提前扩张到多个系统能力开关。
+4. 在完成审计前，不扩张到 `RingIPCHelper`、原始 `IRemoteService` 消息协议、多手势词汇、相机 provider、悬浮窗主开关或白名单深适配实现。
 
 审计基线与支持分层规则见：`docs/app-audit.md`。
 ADB 真机调试记录与已知设备经验见：`docs/adb-debug-log.md`。
