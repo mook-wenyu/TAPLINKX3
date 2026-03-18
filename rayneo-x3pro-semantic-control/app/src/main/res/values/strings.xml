@@ -3,14 +3,14 @@
     <string name="app_name">Semantic Control</string>
     <string name="a11y_service_label">Semantic Control Service</string>
     <string name="a11y_service_description">基于 Accessibility 的语义控制服务，当前已接入焦点遍历、安全激活与 RayNeo 最小输入适配。</string>
-    <string name="homepage_title">开启语义控制</string>
-    <string name="homepage_status_not_enabled">未启用</string>
-    <string name="homepage_status_enabled">已开启</string>
+    <string name="homepage_title">语义控制模式</string>
+    <string name="homepage_status_native_only">原生模式</string>
+    <string name="homepage_status_enhancement_active">增强模式已开启</string>
     <string name="homepage_status_needs_attention">需检查</string>
-    <string name="homepage_helper_not_enabled">开启无障碍服务后，即可使用语义控制。</string>
-    <string name="homepage_helper_enabled">服务已就绪，现在可以开始使用。</string>
-    <string name="homepage_helper_needs_attention">服务已开启，但当前未连接，请前往设置检查。</string>
-    <string name="homepage_cta_enable_service">去开启</string>
+    <string name="homepage_helper_native_only">当前优先使用镜腿与合目界面；开启无障碍可增强跨应用控制。</string>
+    <string name="homepage_helper_enhancement_active">增强模式已就绪，可继续使用跨应用语义控制。</string>
+    <string name="homepage_helper_needs_attention">你选择了增强模式，但服务当前未就绪，请前往设置检查。</string>
+    <string name="homepage_cta_enable_enhancement">开启增强模式</string>
     <string name="homepage_cta_review_service">查看设置</string>
     <string name="homepage_cta_check_service">去检查</string>
 </resources>

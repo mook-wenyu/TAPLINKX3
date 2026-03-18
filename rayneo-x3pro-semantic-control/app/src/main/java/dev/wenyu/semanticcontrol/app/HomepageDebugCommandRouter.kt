@@ -2,7 +2,8 @@ package dev.wenyu.semanticcontrol.app
 
 enum class HomepageDebugCommand(val wireValue: String) {
     Click("click"),
-    DoubleClick("double-click");
+    DoubleClick("double-click"),
+    DumpState("dump-state");
 
     companion object {
         fun fromWireValue(value: String?): HomepageDebugCommand? {
@@ -18,11 +19,17 @@ data class HomepageDebugResult(
 
 class HomepageDebugCommandRouter(
     private val handleTempleAction: (HomepageTempleAction) -> Boolean,
+    private val dumpState: () -> String,
 ) {
     fun handle(command: HomepageDebugCommand): HomepageDebugResult {
+        if (command == HomepageDebugCommand.DumpState) {
+            return HomepageDebugResult(success = true, message = dumpState())
+        }
+
         val action = when (command) {
             HomepageDebugCommand.Click -> HomepageTempleAction.Click
             HomepageDebugCommand.DoubleClick -> HomepageTempleAction.DoubleClick
+            HomepageDebugCommand.DumpState -> error("Handled above")
         }
 
         val success = handleTempleAction(action)

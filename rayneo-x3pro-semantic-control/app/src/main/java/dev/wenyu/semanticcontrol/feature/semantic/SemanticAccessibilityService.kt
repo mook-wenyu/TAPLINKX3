@@ -6,6 +6,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityEvent
+import dev.wenyu.semanticcontrol.app.AccessibilityServiceConnectionState
 import dev.wenyu.semanticcontrol.core.contracts.GestureSignal
 import dev.wenyu.semanticcontrol.core.contracts.SemanticAction
 import dev.wenyu.semanticcontrol.feature.gesture.PinchConfirmController
@@ -29,6 +30,7 @@ class SemanticAccessibilityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         activeInstance = this
+        AccessibilityServiceConnectionState.isConnected = true
         navigator = SemanticNavigator(this)
         overlayController = FocusHudOverlayController(this)
         pinchConfirmController = PinchConfirmController(
@@ -122,6 +124,7 @@ class SemanticAccessibilityService : AccessibilityService() {
         if (activeInstance === this) {
             activeInstance = null
         }
+        AccessibilityServiceConnectionState.isConnected = false
         overlayController.detach()
         super.onDestroy()
     }

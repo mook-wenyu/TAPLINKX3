@@ -154,11 +154,11 @@
 - Modify: `rayneo-x3pro-semantic-control/docs/PRODUCT_STRATEGY.md`
 - Test: `rayneo-x3pro-semantic-control/app/src/test/...`
 
-- [ ] Persist whether the user is in `native-only` or `accessibility-enhanced` mode
-- [ ] Treat accessibility as optional enhancement, not a blocking bootstrap prerequisite
-- [ ] Recover cleanly after returning from Settings or after process death
-- [ ] Keep homepage messaging honest when accessibility is unavailable or unenabled
-- [ ] Add deterministic tests for mode transitions and relaunch recovery
+- [x] Persist whether the user is in `native-only` or `accessibility-enhanced` mode
+- [x] Treat accessibility as optional enhancement, not a blocking bootstrap prerequisite
+- [x] Recover cleanly after returning from Settings or after process death
+- [x] Keep homepage messaging honest when accessibility is unavailable or unenabled
+- [x] Add deterministic tests for mode transitions and relaunch recovery
 
 ## Task 13: OEM / Preinstall Feasibility Track
 

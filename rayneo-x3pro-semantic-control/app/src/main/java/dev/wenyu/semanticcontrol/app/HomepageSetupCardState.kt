@@ -1,8 +1,13 @@
 package dev.wenyu.semanticcontrol.app
 
+enum class AccessibilityMode {
+    NativeOnly,
+    AccessibilityEnhanced,
+}
+
 enum class HomepageSetupStatus {
-    NotEnabled,
-    Enabled,
+    NativeOnly,
+    EnhancementActive,
     NeedsAttention,
 }
 
@@ -11,42 +16,49 @@ enum class HomepageCtaAction {
 }
 
 data class HomepageSetupCardState(
+    val resolvedMode: AccessibilityMode,
     val status: HomepageSetupStatus,
     val statusLineResId: Int,
     val helperLineResId: Int,
     val ctaLabelResId: Int,
     val ctaAction: HomepageCtaAction,
+    val preferredModeOnPrimaryAction: AccessibilityMode? = null,
 )
 
 class HomepageSetupCardStateResolver {
 
     fun resolve(
+        preferredMode: AccessibilityMode,
         isAccessibilityServiceEnabled: Boolean,
         isAccessibilityServiceConnected: Boolean,
     ): HomepageSetupCardState {
         return when {
-            !isAccessibilityServiceEnabled -> HomepageSetupCardState(
-                status = HomepageSetupStatus.NotEnabled,
-                statusLineResId = R.string.homepage_status_not_enabled,
-                helperLineResId = R.string.homepage_helper_not_enabled,
-                ctaLabelResId = R.string.homepage_cta_enable_service,
-                ctaAction = HomepageCtaAction.OpenAccessibilitySettings,
-            )
-
-            isAccessibilityServiceConnected -> HomepageSetupCardState(
-                status = HomepageSetupStatus.Enabled,
-                statusLineResId = R.string.homepage_status_enabled,
-                helperLineResId = R.string.homepage_helper_enabled,
+            isAccessibilityServiceEnabled && isAccessibilityServiceConnected -> HomepageSetupCardState(
+                resolvedMode = AccessibilityMode.AccessibilityEnhanced,
+                status = HomepageSetupStatus.EnhancementActive,
+                statusLineResId = R.string.homepage_status_enhancement_active,
+                helperLineResId = R.string.homepage_helper_enhancement_active,
                 ctaLabelResId = R.string.homepage_cta_review_service,
                 ctaAction = HomepageCtaAction.OpenAccessibilitySettings,
             )
 
-            else -> HomepageSetupCardState(
+            preferredMode == AccessibilityMode.AccessibilityEnhanced -> HomepageSetupCardState(
+                resolvedMode = AccessibilityMode.AccessibilityEnhanced,
                 status = HomepageSetupStatus.NeedsAttention,
                 statusLineResId = R.string.homepage_status_needs_attention,
                 helperLineResId = R.string.homepage_helper_needs_attention,
                 ctaLabelResId = R.string.homepage_cta_check_service,
                 ctaAction = HomepageCtaAction.OpenAccessibilitySettings,
+            )
+
+            else -> HomepageSetupCardState(
+                resolvedMode = AccessibilityMode.NativeOnly,
+                status = HomepageSetupStatus.NativeOnly,
+                statusLineResId = R.string.homepage_status_native_only,
+                helperLineResId = R.string.homepage_helper_native_only,
+                ctaLabelResId = R.string.homepage_cta_enable_enhancement,
+                ctaAction = HomepageCtaAction.OpenAccessibilitySettings,
+                preferredModeOnPrimaryAction = AccessibilityMode.AccessibilityEnhanced,
             )
         }
     }
