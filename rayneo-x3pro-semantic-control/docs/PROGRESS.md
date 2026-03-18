@@ -49,6 +49,7 @@
 - 真机已确认 `native-only` 默认态；增强态与恢复态的设备侧更细观察仍受 Mercury 前台/杀进程时序影响，后续继续补证据
 - 明确把“无外设 + 摄像机视觉 + 第三方后台常驻 + 手势控制第三方应用”重新写回北极星目标；当前 X3 壳层/镜腿/Accessibility 工作被重新定位为近期交付轨道与基础设施
 - 补充最新公开技术约束：MediaPipe/on-device 手势仍是现实候选，但 Android 背景摄像头与 camera foreground service 限制意味着标准第三方 app 不能把“长期后台常驻摄像机视觉”直接当成近期默认主线
+- 已把下一条合理任务正式收敛为 `camera-vision feasibility spike`：先验证前台 camera feed 与手在画面中的可用性，而不是直接承诺后台常驻视觉手势
 - 写入产品策略、实施计划和项目 README
 
 ### 未完成
@@ -59,6 +60,7 @@
 - 系统无障碍设置页的端到端镜腿可操作性验证
 - 替代无障碍启用链方案评估（OEM / 伴生端 / 预装）
 - `accessibility-enhanced` 与 `needs-attention` 的更细真机状态可视化验证
+- `camera-vision feasibility spike`
 
 说明：当前 feature work 已完成到 MVP 所需的确认链路、Mercury bootstrap 和 `TouchDispatcherX3` 输入 spike。下一步不应继续扩张输入 feature，而应先做 App 审计，并判断是否真的需要 vendor 焦点辅助。
 
