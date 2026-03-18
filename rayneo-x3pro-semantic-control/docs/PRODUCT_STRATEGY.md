@@ -29,7 +29,8 @@
 
 ### 做什么
 
-- `Accessibility-first`
+- `X3-native binocular shell + temple gesture first`
+- `Accessibility as fallback / compatibility path`
 - `pinch confirm`
 - `focus navigation`
 - 极简 HUD 焦点反馈
@@ -44,14 +45,15 @@
 - 复杂手势语法
 - 未经确认的厂商私有深度接口依赖
 - 在主入口提前暴露悬浮窗总开关
+- 继续在手机式单屏 Activity 外壳上扩张用户可见主流程
 
 ## 4. 长期演进
 
 ### 阶段 1：MVP
 
-- 通用语义焦点导航
-- 捏合确认
-- 基础全局动作
+- 合目双屏首页壳
+- 镜腿手势驱动焦点导航
+- 基础语义确认与全局动作
 
 ### 阶段 2：全局语义控制
 
@@ -99,7 +101,27 @@
 3. 它对核心任务完成率有明确增益
 4. 它不会与无障碍主路径竞争首页主注意力
 
-## 7. 成功标准
+## 7. 路线修正
+
+基于 `RayNeo X3 Pro` 官方能力文档、`MercuryAndroidSample` 样例和真机/SDK 证据，当前路线需要修正为：
+
+1. **产品主路径**：`X3-native binocular UI + temple gestures + focus navigation`
+2. **兼容路径**：`Accessibility-first semantic control`
+3. **设备适配层**：继续使用 `MercuryAndroidSDK` 作为输入 / 合目 / 焦点 shim
+
+这意味着：
+
+- `Accessibility-first` 不再适合作为用户可见 UI 壳层的第一优先级
+- 对用户可见主界面（首页、引导页、状态页），优先采用 `BaseMirrorActivity / BindingPair` 一类的合目双屏模式
+- 刚完成的单屏首页切片只能视为临时过渡验证，不应继续作为长期外壳扩张更多页面
+
+当前最重要的新任务不是继续修补单屏首页，而是：
+
+- 建立 `X3-native binocular homepage shell`
+- 将首页单卡内容迁移到合目双屏壳层中
+- 让镜腿手势成为首页交互主链
+
+## 8. 成功标准
 
 MVP 的成功不是“识别了多少种手势”，而是：
 

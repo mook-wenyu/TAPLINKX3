@@ -28,4 +28,5 @@
 - Fixed a real-device traversal bug by separating `isFocusable` from actual `ACTION_FOCUS` support.
 - Replaced the static homepage with a single AR-first setup card driven by accessibility-service state and a settings CTA.
 - Verified the homepage card on device: one centered card, concise Chinese copy, no overlay control surface, and a working settings handoff CTA.
+- Reassessed the device route using the local capability PDF, Mercury sample, and external evidence: for X3 Pro, binocular mirrored UI plus temple gestures should drive the user-visible shell, and the current single-layout homepage should be treated as temporary.
 - Next: audit target apps before deciding whether vendor focus helpers are actually needed.
