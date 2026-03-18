@@ -29,4 +29,6 @@
 - Replaced the static homepage with a single AR-first setup card driven by accessibility-service state and a settings CTA.
 - Verified the homepage card on device: one centered card, concise Chinese copy, no overlay control surface, and a working settings handoff CTA.
 - Reassessed the device route using the local capability PDF, Mercury sample, and external evidence: for X3 Pro, binocular mirrored UI plus temple gestures should drive the user-visible shell, and the current single-layout homepage should be treated as temporary.
+- Migrated the homepage shell onto Mercury's mirrored activity path and added a small temple-action router for the single-card interaction model.
+- Verified the new shell compiles, passes tests, and launches on device without crashing; deeper binocular UI inspection still needs follow-up.
 - Next: audit target apps before deciding whether vendor focus helpers are actually needed.
