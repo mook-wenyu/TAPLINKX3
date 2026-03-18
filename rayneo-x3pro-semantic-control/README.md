@@ -43,6 +43,7 @@
 3. 在完成审计前，不扩张到 `RingIPCHelper`、原始 `IRemoteService` 消息协议、多手势词汇、相机 provider 或白名单深适配实现。
 
 审计基线与支持分层规则见：`docs/app-audit.md`。
+ADB 真机调试记录与已知设备经验见：`docs/adb-debug-log.md`。
 
 ## 构建
 

@@ -29,6 +29,9 @@
 - 同步 `docs/IMPLEMENTATION_PLAN.md` 与启动页文案，明确下一步是目标 App 审计、`FocusTracker / RecyclerViewFocusTracker` 判断与 `TouchDispatcherX3` 真机验证，而不是继续扩张新 feature
 - 新增 `docs/app-audit.md`，固化第一轮目标 App 类别、审计维度、支持分层与 `FocusTracker` 试验门槛
 - 新增 `AppSupportTier` / `AppAuditSnapshot` 纯领域类型与单测，把 `generic / whitelist-candidate / unsupported` 判断收敛为可测试规则
+- 新增 ADB 调试控制面：可通过显式 foreground broadcast 触发 `dump-root`、`focus-next`、`focus-previous`、`activate-focused`
+- 完成第一轮真机调试，并在 `docs/adb-debug-log.md` 记录成功路径、失败路径、可复用命令与系统设置首页的首个审计样本
+- 修复一个真机暴露出来的焦点遍历问题：不再把 `isFocusable` 误判为支持 `ACTION_FOCUS`
 - 写入产品策略、实施计划和项目 README
 
 ### 未完成

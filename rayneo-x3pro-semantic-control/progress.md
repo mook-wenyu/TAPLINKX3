@@ -23,4 +23,7 @@
 - Synced the implementation plan and launcher copy to the post-TouchDispatcher state so the next round is clearly app audit plus the `FocusTracker` decision, not more feature growth.
 - Added `docs/app-audit.md` to define the first-wave audit rubric, target app categories, support tiers, and FocusTracker decision gate.
 - Added pure audit tiering types plus unit tests so `Generic`, `WhitelistCandidate`, and `Unsupported` can be derived consistently from tree, focusability, and activation signals.
+- Added an ADB-driven semantic debug bridge so device-side audits can trigger `dump-root`, `focus-next`, `focus-previous`, and `activate-focused` from the shell.
+- Logged the first live-device session in `docs/adb-debug-log.md`, including the successful enable path, the Android 12 broadcast restriction, and the first failing Settings homepage sample.
+- Fixed a real-device traversal bug by separating `isFocusable` from actual `ACTION_FOCUS` support.
 - Next: audit target apps before deciding whether vendor focus helpers are actually needed.

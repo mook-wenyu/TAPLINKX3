@@ -26,6 +26,7 @@
 - [x] Introduced a minimal RayNeo vendor adapter boundary and Mercury bootstrap
 - [x] Implemented a minimal `TouchDispatcherX3 + CommonTouchCallback` input spike
 - [x] Added an app-audit baseline document and support-tier heuristics for the next device round
+- [x] Added an ADB-driven debug command bridge for real-device semantic audits
 - [ ] Completed target app accessibility audit
 - [ ] Verified whether `FocusTracker / RecyclerViewFocusTracker` materially improve on the existing accessibility-first focus model
 - [ ] Completed real-device validation of the `TouchDispatcherX3` input spike on X3 Pro hardware
@@ -95,6 +96,23 @@
 - [ ] Audit accessibility tree quality and action reachability
 - [ ] Tag apps as `generic`, `whitelist-candidate`, or `unsupported`
 - [x] Document whitelist triggers and non-goals
+
+## Task 7: Device Debugging Harness
+
+**Files:**
+- Create: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/feature/semantic/debug/SemanticDebugCommandRouter.kt`
+- Create: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/feature/semantic/debug/SemanticDebugReceiver.kt`
+- Modify: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/feature/semantic/SemanticAccessibilityService.kt`
+- Modify: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/feature/semantic/FocusTraversalPlanner.kt`
+- Modify: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/feature/semantic/SemanticNavigator.kt`
+- Modify: `rayneo-x3pro-semantic-control/app/src/main/AndroidManifest.xml`
+- Test: `rayneo-x3pro-semantic-control/app/src/test/java/dev/wenyu/semanticcontrol/feature/semantic/debug/SemanticDebugCommandRouterTest.kt`
+- Test: `rayneo-x3pro-semantic-control/app/src/test/java/dev/wenyu/semanticcontrol/feature/semantic/FocusTraversalPlannerTest.kt`
+
+- [x] Add an explicit ADB-triggerable debug command bridge for dump and semantic actions
+- [x] Record first live-device successes, failures, and command recipes in `docs/adb-debug-log.md`
+- [x] Fix the false assumption that `isFocusable` implies support for `ACTION_FOCUS`
+- [ ] Expand device-side snapshot detail if the next audit round still lacks enough evidence
 
 ## Task 6: RayNeo X3 Pro Vendor Adaptation Boundary
 
