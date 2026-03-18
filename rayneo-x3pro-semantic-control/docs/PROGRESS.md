@@ -36,6 +36,8 @@
 - 将首页从静态说明页替换为单卡 AR 引导页，加入 `未启用 / 已开启 / 需检查` 三态与无障碍设置跳转
 - 为首页服务状态解析新增本地单测，并通过主线单测与 `assembleDebug`
 - 基于 `能力介绍 _ API.pdf`、Mercury 样例和外部资料完成路线复核：对 X3 Pro 来说，用户可见壳层应优先走原生合目双屏 + 镜腿手势，而不是继续沿单屏手机式外壳扩张
+- 将首页壳层迁移为 `BaseMirrorActivity` 驱动的 Mercury 合目双屏实现，并保留现有单卡内容模型
+- 为首页新增镜腿手势路由单测；主线测试和 `assembleDebug` 已通过，真机已完成无崩溃启动验证
 - 写入产品策略、实施计划和项目 README
 
 ### 未完成
@@ -43,7 +45,7 @@
 - App 审计与白名单策略
 - 是否需要 `FocusTracker / RecyclerViewFocusTracker` 的真机判断
 - 相机 hand-tracking provider 是否仍有必要的复盘判断
-- 合目双屏首页壳替换当前临时单屏首页
+- 合目双屏首页更细的真机可视 / 交互验证
 
 说明：当前 feature work 已完成到 MVP 所需的确认链路、Mercury bootstrap 和 `TouchDispatcherX3` 输入 spike。下一步不应继续扩张输入 feature，而应先做 App 审计，并判断是否真的需要 vendor 焦点辅助。
 

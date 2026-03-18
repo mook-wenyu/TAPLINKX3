@@ -30,6 +30,7 @@
 - [x] Clarified the homepage product decision: one accessibility-service setup card, no main overlay toggle yet
 - [x] Replaced the static homepage with a single AR-first accessibility-service setup card
 - [x] Reassessed the device path and decided the single-layout homepage is only a temporary slice for X3 Pro
+- [x] Migrated the homepage shell to `BaseMirrorActivity` with Mercury-driven binocular setup wiring
 - [ ] Completed target app accessibility audit
 - [ ] Verified whether `FocusTracker / RecyclerViewFocusTracker` materially improve on the existing accessibility-first focus model
 - [ ] Completed real-device validation of the `TouchDispatcherX3` input spike on X3 Pro hardware
@@ -110,11 +111,11 @@
 - Create or modify: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/vendor/rayneo/...`
 - Modify: `rayneo-x3pro-semantic-control/docs/PRODUCT_STRATEGY.md`
 
-- [ ] Replace the temporary single-layout homepage shell with an X3-native binocular mirrored shell
-- [ ] Rehost the current setup-card content inside a mirrored left/right presentation path
-- [ ] Promote native temple gestures to the homepage interaction primary path
+- [x] Replace the temporary single-layout homepage shell with an X3-native binocular mirrored shell
+- [x] Rehost the current setup-card content inside a mirrored left/right presentation path
+- [x] Promote native temple gestures to the homepage interaction primary path
 - [ ] Keep accessibility as a compatibility/fallback path rather than the shell architecture driver
-- [ ] Verify the binocular homepage on device before adding more user-visible pages
+- [ ] Finish deeper on-device binocular homepage verification before adding more user-visible pages
 
 ## Task 5: App Audit and Whitelist Strategy
 
