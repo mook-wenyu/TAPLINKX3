@@ -25,8 +25,10 @@
 - [x] Compared `MercuryAndroidSDK` v0.2.2 and v0.2.5 public API surface
 - [x] Introduced a minimal RayNeo vendor adapter boundary and Mercury bootstrap
 - [x] Implemented a minimal `TouchDispatcherX3 + CommonTouchCallback` input spike
-- [ ] Implemented camera-backed gesture provider pipeline
 - [ ] Completed target app accessibility audit
+- [ ] Verified whether `FocusTracker / RecyclerViewFocusTracker` materially improve on the existing accessibility-first focus model
+- [ ] Completed real-device validation of the `TouchDispatcherX3` input spike on X3 Pro hardware
+- [ ] Reassessed whether a camera-backed gesture provider is still necessary after audit findings
 
 ## Task 1: Foundation Scaffold
 
@@ -66,7 +68,7 @@
 
 - [x] Keep only one primary confirmation gesture for MVP
 - [x] Route pinch confirm into the existing focused activation path
-- [ ] Integrate a camera-backed gesture provider behind an interface
+- [ ] Reassess whether a camera-backed gesture provider is still necessary after target-app audit and X3 Pro device validation
 - [x] Add cancel and cooldown handling to the confirmation path
 - [x] Add deterministic tests for the pinch confirm controller path
 
@@ -104,4 +106,4 @@
 - [x] Introduce an internal vendor adapter package boundary in code
 - [x] Bootstrap Mercury through an internal runtime wrapper and manifest handshake
 - [x] Prototype `TouchDispatcherX3 + CommonTouchCallback` as an X3-native input shim
-- [ ] Verify whether `FocusTracker` materially improves on the existing accessibility-first focus model
+- [ ] Verify whether `FocusTracker / RecyclerViewFocusTracker` materially improve on the existing accessibility-first focus model after target-app audit
