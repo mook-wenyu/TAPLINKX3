@@ -44,6 +44,9 @@
 - 真机复测表明：当顶部 Activity 切到 `com.android.settings` 后，Mercury/系统会强制停掉第三方应用进程，导致 `SemanticAccessibilityService` 失活；因此当前应用内语义辅助无法继续陪跑系统设置流程
 - 完成替代启用链策略矩阵：当前默认路线调整为 `Accessibility = enhancement-only`，OEM/预装维持为次级高价值路线，手机伴生端仅保留为探索项
 - 已将替代启用链策略翻译成明确后续任务：可选无障碍模式状态机、OEM/预装可行性跟踪、手机伴生端探索边界
+- 实现可选无障碍模式状态机：首页现在会持久化 `native-only / accessibility-enhanced` 模式，并在服务失活后回落为诚实的恢复状态而不是假定“必须先开启无障碍”
+- 为可选无障碍模式新增本地单测，并通过主线单测与 `assembleDebug`
+- 真机已确认 `native-only` 默认态；增强态与恢复态的设备侧更细观察仍受 Mercury 前台/杀进程时序影响，后续继续补证据
 - 写入产品策略、实施计划和项目 README
 
 ### 未完成
@@ -53,6 +56,7 @@
 - 相机 hand-tracking provider 是否仍有必要的复盘判断
 - 系统无障碍设置页的端到端镜腿可操作性验证
 - 替代无障碍启用链方案评估（OEM / 伴生端 / 预装）
+- `accessibility-enhanced` 与 `needs-attention` 的更细真机状态可视化验证
 
 说明：当前 feature work 已完成到 MVP 所需的确认链路、Mercury bootstrap 和 `TouchDispatcherX3` 输入 spike。下一步不应继续扩张输入 feature，而应先做 App 审计，并判断是否真的需要 vendor 焦点辅助。
 

@@ -30,11 +30,16 @@ class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
     )
 
     private var focusTracker: FixPosFocusTracker? = null
+    private lateinit var modeStore: AccessibilityModeStore
     private var currentCtaAction = HomepageCtaAction.OpenAccessibilitySettings
+    private lateinit var currentCardState: HomepageSetupCardState
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activeInstance = this
+        modeStore = SharedPreferencesAccessibilityModeStore(
+            getSharedPreferences(SharedPreferencesAccessibilityModeStore.PREFS_NAME, MODE_PRIVATE),
+        )
         initHomepageFocus()
         initTempleActions()
         renderHomepage()
@@ -101,7 +106,10 @@ class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
     }
 
     fun handleDebugCommand(command: HomepageDebugCommand): HomepageDebugResult {
-        val router = HomepageDebugCommandRouter(::handleHomepageTempleAction)
+        val router = HomepageDebugCommandRouter(
+            handleTempleAction = ::handleHomepageTempleAction,
+            dumpState = ::buildHomepageSnapshot,
+        )
         var result = HomepageDebugResult(success = false, message = "ui-timeout")
         val latch = CountDownLatch(1)
         runOnUiThread {
@@ -117,7 +125,19 @@ class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
         return actionRouter.handle(action)
     }
 
+    private fun buildHomepageSnapshot(): String {
+        return buildString {
+            append("mode=")
+            append(currentCardState.resolvedMode.name)
+            append(";status=")
+            append(currentCardState.status.name)
+            append(";cta=")
+            append(currentCtaAction.name)
+        }
+    }
+
     private fun performCurrentAction(): Boolean {
+        currentCardState.preferredModeOnPrimaryAction?.let(modeStore::write)
         return when (currentCtaAction) {
             HomepageCtaAction.OpenAccessibilitySettings -> {
                 Log.i(TAG, "Opening accessibility settings from homepage")
@@ -128,10 +148,15 @@ class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
     }
 
     private fun renderHomepage() {
+        val preferredMode = modeStore.read()
         val state = stateResolver.resolve(
+            preferredMode = preferredMode,
             isAccessibilityServiceEnabled = isAccessibilityServiceEnabled(),
             isAccessibilityServiceConnected = isAccessibilityServiceConnected(),
         )
+        if (state.resolvedMode != preferredMode) {
+            modeStore.write(state.resolvedMode)
+        }
 
         mBindingPair.updateView {
             titleText.setText(R.string.homepage_title)
@@ -139,6 +164,11 @@ class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
             helperText.setText(state.helperLineResId)
             primaryButton.setText(state.ctaLabelResId)
         }
+        Log.i(
+            TAG,
+            "Homepage state mode=${state.resolvedMode} status=${state.status} cta=${state.ctaAction}",
+        )
+        currentCardState = state
         currentCtaAction = state.ctaAction
     }
 
@@ -159,13 +189,7 @@ class MainActivity : BaseMirrorActivity<ActivityMainBinding>() {
     }
 
     private fun isAccessibilityServiceConnected(): Boolean {
-        val enabledServices = Settings.Secure.getString(
-            contentResolver,
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
-        ) ?: return false
-
-        val targetService = ComponentName(packageName, ACCESSIBILITY_SERVICE_CLASS_NAME).flattenToString()
-        return enabledServices.split(':').any { it == targetService }
+        return AccessibilityServiceConnectionState.isConnected
     }
 
     companion object {

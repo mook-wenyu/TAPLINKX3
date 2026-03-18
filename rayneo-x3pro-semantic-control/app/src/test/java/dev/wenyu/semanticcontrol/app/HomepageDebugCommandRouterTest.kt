@@ -11,6 +11,7 @@ class HomepageDebugCommandRouterTest {
     fun `wire values map to known homepage debug commands`() {
         assertEquals(HomepageDebugCommand.Click, HomepageDebugCommand.fromWireValue("click"))
         assertEquals(HomepageDebugCommand.DoubleClick, HomepageDebugCommand.fromWireValue("double-click"))
+        assertEquals(HomepageDebugCommand.DumpState, HomepageDebugCommand.fromWireValue("dump-state"))
         assertEquals(null, HomepageDebugCommand.fromWireValue("unknown"))
     }
 
@@ -22,6 +23,7 @@ class HomepageDebugCommandRouterTest {
                 called = true
                 true
             },
+            dumpState = { "unused" },
         )
 
         val result = commandRouter.handle(HomepageDebugCommand.Click)
@@ -39,6 +41,7 @@ class HomepageDebugCommandRouterTest {
                 action = it
                 true
             },
+            dumpState = { "unused" },
         )
 
         val result = commandRouter.handle(HomepageDebugCommand.DoubleClick)
@@ -52,11 +55,25 @@ class HomepageDebugCommandRouterTest {
     fun `router surfaces failed command`() {
         val commandRouter = HomepageDebugCommandRouter(
             handleTempleAction = { false },
+            dumpState = { "unused" },
         )
 
         val result = commandRouter.handle(HomepageDebugCommand.Click)
 
         assertFalse(result.success)
         assertEquals("click:failed", result.message)
+    }
+
+    @Test
+    fun `dump state returns homepage snapshot`() {
+        val commandRouter = HomepageDebugCommandRouter(
+            handleTempleAction = { true },
+            dumpState = { "mode=NativeOnly;status=NativeOnly" },
+        )
+
+        val result = commandRouter.handle(HomepageDebugCommand.DumpState)
+
+        assertTrue(result.success)
+        assertEquals("mode=NativeOnly;status=NativeOnly", result.message)
     }
 }
