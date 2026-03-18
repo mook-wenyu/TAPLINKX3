@@ -35,4 +35,5 @@
 - Audited the accessibility enable path and downgraded user-driven settings enablement to a pending/high-risk path: homepage handoff is verified, but end-to-end settings navigation by temple gestures is still unproven.
 - Refined the next step for enable-path validation: expand settings-page semantic snapshot detail before making stronger claims about temple-only enablement.
 - Verified a stronger blocker on device: switching to Android Settings can force-stop the app process, which breaks any in-process semantic assist path during the enable flow.
+- Converted the enablement decision into a strategy matrix: accessibility is now the default enhancement-only layer, OEM/preinstall stays as the secondary high-upside path, companion-phone enablement remains exploratory, and ADB stays dev-only.
 - Next: audit target apps before deciding whether vendor focus helpers are actually needed.
