@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Semantic Control</string>
-    <string name="launcher_summary">独立 Android 项目骨架已创建。当前版本已经收敛为单 app 模块，使用包级分层组织 Accessibility、手势、语义动作与 HUD 占位实现。</string>
+    <string name="launcher_summary">当前版本已完成单 app 模块骨架、语义焦点遍历、安全激活、pinch-confirm、RayNeo vendor boundary、Mercury bootstrap 与 TouchDispatcherX3 最小输入 spike。</string>
     <string name="architecture_header">当前结构</string>
-    <string name="architecture_body">单 app 模块 + 包级分层：app、core.contracts、feature.gesture、feature.overlay、feature.semantic。</string>
+    <string name="architecture_body">单 app 模块 + 包级分层：app、core.contracts、feature.gesture、feature.overlay、feature.semantic、vendor.rayneo。</string>
     <string name="next_steps_header">下一步</string>
-    <string name="next_steps_body">1. 接入 AccessibilityService。 2. 接入 pinch-confirm 输入链。 3. 建立焦点导航与 HUD 反馈。 4. 做首批目标 App 审计与白名单策略。</string>
+    <string name="next_steps_body">1. 在真机上审计首批目标 App 的 accessibility tree、focusability 与 activation 质量。 2. 决定是否真的需要 FocusTracker / RecyclerViewFocusTracker。 3. 验证 TouchDispatcherX3 输入 spike 的真机稳定性。 4. 在完成审计前，不扩张相机 provider、IPC 或更多手势词汇。</string>
     <string name="a11y_service_label">Semantic Control Service</string>
-    <string name="a11y_service_description">基于 Accessibility 的语义控制服务骨架。</string>
+    <string name="a11y_service_description">基于 Accessibility 的语义控制服务，当前已接入焦点遍历、安全激活与 RayNeo 最小输入适配。</string>
 </resources>

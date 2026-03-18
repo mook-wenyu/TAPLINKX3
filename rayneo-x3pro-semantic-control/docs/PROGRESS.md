@@ -26,6 +26,7 @@
 - 实现 `TouchDispatcherX3 + CommonTouchCallback` 到内部语义动作的最小输入适配层
 - 保持 `TouchDispatcherX3` 只经由 `vendor.rayneo` 包进入主线，不改写现有语义导航模型
 - 为输入映射 bridge 增加本地单测，并通过主线单测和 `assembleDebug`
+- 同步 `docs/IMPLEMENTATION_PLAN.md` 与启动页文案，明确下一步是目标 App 审计、`FocusTracker / RecyclerViewFocusTracker` 判断与 `TouchDispatcherX3` 真机验证，而不是继续扩张新 feature
 - 写入产品策略、实施计划和项目 README
 
 ### 未完成

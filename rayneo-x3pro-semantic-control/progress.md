@@ -20,4 +20,5 @@
 - Bootstrapped Mercury through an internal runtime wrapper and added the RayNeo manifest handshake.
 - Added a minimal `TouchDispatcherX3 + CommonTouchCallback` input adapter that maps into existing semantic actions.
 - Added unit tests for the touch semantic bridge and kept the full build green.
+- Synced the implementation plan and launcher copy to the post-TouchDispatcher state so the next round is clearly app audit plus the `FocusTracker` decision, not more feature growth.
 - Next: audit target apps before deciding whether vendor focus helpers are actually needed.
