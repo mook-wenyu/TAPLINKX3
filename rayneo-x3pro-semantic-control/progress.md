@@ -26,4 +26,6 @@
 - Added an ADB-driven semantic debug bridge so device-side audits can trigger `dump-root`, `focus-next`, `focus-previous`, and `activate-focused` from the shell.
 - Logged the first live-device session in `docs/adb-debug-log.md`, including the successful enable path, the Android 12 broadcast restriction, and the first failing Settings homepage sample.
 - Fixed a real-device traversal bug by separating `isFocusable` from actual `ACTION_FOCUS` support.
+- Replaced the static homepage with a single AR-first setup card driven by accessibility-service state and a settings CTA.
+- Verified the homepage card on device: one centered card, concise Chinese copy, no overlay control surface, and a working settings handoff CTA.
 - Next: audit target apps before deciding whether vendor focus helpers are actually needed.

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="homepage_screen_padding_horizontal">32dp</dimen>
+    <dimen name="homepage_screen_padding_vertical">24dp</dimen>
+    <dimen name="homepage_card_max_width">640dp</dimen>
+    <dimen name="homepage_card_corner_radius">24dp</dimen>
+    <dimen name="homepage_card_elevation">4dp</dimen>
+    <dimen name="homepage_card_stroke_width">1dp</dimen>
+    <dimen name="homepage_card_padding">32dp</dimen>
+    <dimen name="homepage_content_spacing">16dp</dimen>
+    <dimen name="homepage_button_margin_top">24dp</dimen>
+    <dimen name="homepage_button_min_height">56dp</dimen>
+    <dimen name="homepage_title_text_size">28sp</dimen>
+    <dimen name="homepage_body_text_size">24sp</dimen>
+</resources>

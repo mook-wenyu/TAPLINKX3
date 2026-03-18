@@ -28,6 +28,7 @@
 - [x] Added an app-audit baseline document and support-tier heuristics for the next device round
 - [x] Added an ADB-driven debug command bridge for real-device semantic audits
 - [x] Clarified the homepage product decision: one accessibility-service setup card, no main overlay toggle yet
+- [x] Replaced the static homepage with a single AR-first accessibility-service setup card
 - [ ] Completed target app accessibility audit
 - [ ] Verified whether `FocusTracker / RecyclerViewFocusTracker` materially improve on the existing accessibility-first focus model
 - [ ] Completed real-device validation of the `TouchDispatcherX3` input spike on X3 Pro hardware
@@ -94,11 +95,11 @@
 - Modify: `rayneo-x3pro-semantic-control/app/src/main/res/values/strings.xml`
 - Modify: `rayneo-x3pro-semantic-control/docs/PRODUCT_STRATEGY.md`
 
-- [ ] Replace the static homepage summary with a single AR-first setup card centered on accessibility service status
-- [ ] Model homepage states as `not enabled / enabled / needs attention` instead of a fake in-app system toggle
-- [ ] Deep-link from the CTA into the relevant accessibility settings path
-- [ ] Keep overlay out of the main control surface until it becomes a real permission-backed feature
-- [ ] Verify the homepage still respects RayNeo X3 Pro single-goal and safe-attention constraints
+- [x] Replace the static homepage summary with a single AR-first setup card centered on accessibility service status
+- [x] Model homepage states as `not enabled / enabled / needs attention` instead of a fake in-app system toggle
+- [x] Deep-link from the CTA into the relevant accessibility settings path
+- [x] Keep overlay out of the main control surface until it becomes a real permission-backed feature
+- [x] Verify the homepage still respects RayNeo X3 Pro single-goal and safe-attention constraints
 
 ## Task 5: App Audit and Whitelist Strategy
 
