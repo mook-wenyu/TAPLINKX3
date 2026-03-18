@@ -200,3 +200,17 @@ We have not yet demonstrated, with temple gestures only, that a user can:
 - `Homepage -> Settings` handoff is valid.
 - `Settings -> fully enabled service by temple gestures only` remains a high-risk / pending path.
 - Product docs should no longer treat manual settings enablement as an already validated mainstream onboarding path.
+
+### Additional evidence gathered later the same day
+
+- Re-enabling the service via ADB confirms that the service can still bind correctly before settings-page tests.
+- Public attempts to land directly on an app-specific accessibility detail page did not yield a reliable deeper entry point; the system continued resolving to generic Settings.
+- Current `SemanticDebugReceiver` instrumentation is still too coarse for end-to-end enablement proof on the settings side:
+  - it can prove page handoff,
+  - but it cannot yet explain, step by step, which list item / dialog / toggle is currently being targeted.
+
+### Refined conclusion
+
+- The missing proof is no longer “can we open settings?” — that is already solved.
+- The missing proof is “can we observe and complete the settings flow with enough fidelity to trust temple-only enablement?”
+- The smallest justified next step is richer semantic snapshot detail for settings-page audits, not a brand-new debug subsystem.
