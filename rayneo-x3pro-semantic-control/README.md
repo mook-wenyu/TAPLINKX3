@@ -4,7 +4,7 @@
 
 当前产品方向：
 
-- 短期：`Accessibility-first + pinch confirm + focus navigation`
+- 短期：`X3-native binocular UI + temple gestures`，`Accessibility` 作为增强层
 - 长期：`全局语义控制 + 白名单 App 深适配`
 
 当前版本已经完成单模块工程骨架、语义焦点遍历、`pinch -> activate focused target` 的最小确认适配层、第一版 `RayNeo vendor adapter boundary + Mercury bootstrap`，以及 `TouchDispatcherX3` 到内部语义动作的最小输入 spike。
@@ -46,6 +46,7 @@
 2. 基于审计结果决定是否真的需要 `FocusTracker / RecyclerViewFocusTracker`，而不是先把 vendor 焦点体系并入主线。
 3. 首页入口优先收敛为单个无障碍服务状态卡，而不是提前扩张到多个系统能力开关。
 4. 在完成审计前，不扩张到 `RingIPCHelper`、原始 `IRemoteService` 消息协议、多手势词汇、相机 provider、悬浮窗主开关或白名单深适配实现。
+5. 无障碍服务当前不再作为量产启用链默认主路径，而作为增强层保留；量产替代方案优先级为：`enhancement-only` > `OEM/预装` > `手机伴生端` > `ADB仅开发用`。
 
 审计基线与支持分层规则见：`docs/app-audit.md`。
 ADB 真机调试记录与已知设备经验见：`docs/adb-debug-log.md`。

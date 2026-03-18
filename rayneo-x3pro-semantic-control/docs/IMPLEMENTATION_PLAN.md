@@ -129,9 +129,23 @@
 - [x] Verify homepage `double-click` exits back to launcher on device
 - [x] Confirm that the full user-driven settings enable path is still unproven
 - [ ] Determine whether the system accessibility settings page itself can be operated end-to-end via temple gestures
-- [ ] If not, define the replacement enable strategy (`OEM path / companion phone / privileged integration`)
+- [x] Define the replacement enable strategy matrix (`enhancement-only` default, OEM/system secondary, companion exploratory)
 - [ ] Expand settings-page semantic snapshots so temple-driven enablement can be audited step by step instead of inferred from coarse root data
 - [x] Confirm that switching to Android Settings can force-stop the third-party app process on X3 Pro, breaking any in-process semantic assist path
+
+## Task 11: Replacement Enablement Strategy
+
+**Files:**
+- Modify: `rayneo-x3pro-semantic-control/docs/PRODUCT_STRATEGY.md`
+- Modify: `rayneo-x3pro-semantic-control/docs/IMPLEMENTATION_PLAN.md`
+- Modify: `rayneo-x3pro-semantic-control/docs/PROGRESS.md`
+- Modify: `rayneo-x3pro-semantic-control/README.md`
+
+- [x] Compare `enhancement-only`, `OEM/preinstall/system`, `companion phone`, and `ADB/dev-only` against current repo constraints
+- [x] Set `Accessibility = enhancement-only` as the current product default
+- [x] Keep OEM/system integration as the secondary strategic track
+- [x] Keep companion phone as exploratory only until it proves it can materially change enablement outcomes
+- [ ] Translate this strategy into concrete follow-up implementation tickets
 
 ## Task 5: App Audit and Whitelist Strategy
 
