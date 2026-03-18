@@ -183,6 +183,19 @@
 - [ ] Limit companion scope to onboarding support unless it proves it can materially improve enablement outcomes
 - [ ] Avoid promoting companion-phone flow to the mainline product path without device-side evidence
 
+## Task 15: Camera-Vision Feasibility Spike
+
+**Files:**
+- Modify: `rayneo-x3pro-semantic-control/docs/PRODUCT_STRATEGY.md`
+- Modify: `rayneo-x3pro-semantic-control/docs/IMPLEMENTATION_PLAN.md`
+- Modify: `rayneo-x3pro-semantic-control/docs/PROGRESS.md`
+
+- [ ] Answer one narrow question only: can a standard third-party X3 Pro app, while foregrounded inside the current binocular shell, access a usable camera stream that actually shows the wearer’s hand well enough for a later single-gesture semantic prototype?
+- [ ] Explicitly exclude background residency, long-running camera service claims, multi-gesture vocabulary, MediaPipe integration, HUD polish, and cross-app control during the spike
+- [ ] Define success as: public foreground camera access works, frames are lifecycle-stable for a short session, and the hand is visible enough to justify later egocentric gesture inference
+- [ ] Define failure as: camera access is blocked/fragile, hand visibility is physically unusable, or the spike only works through private/vendor-only assumptions
+- [ ] Route success to a follow-up `single-gesture foreground recognizer` spike; route failure to OEM/preload dependency escalation instead of more app-side CV work
+
 ## Task 5: App Audit and Whitelist Strategy
 
 **Files:**
