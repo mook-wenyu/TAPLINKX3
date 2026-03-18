@@ -4,16 +4,14 @@ data class TraversalCandidateState(
     val hasAccessibilityFocus: Boolean = false,
     val hasInputFocus: Boolean = false,
     val supportsAccessibilityFocus: Boolean = false,
-    val supportsInputFocus: Boolean = false,
+    val supportsInputFocusAction: Boolean = false,
+    val isFocusable: Boolean = false,
 )
 
 class FocusTraversalPlanner {
 
     fun isTraversalCandidate(candidate: TraversalCandidateState): Boolean {
-        return candidate.hasAccessibilityFocus ||
-            candidate.hasInputFocus ||
-            candidate.supportsAccessibilityFocus ||
-            candidate.supportsInputFocus
+        return candidate.isCurrentlyFocused() || candidate.canReceiveProgrammaticFocus()
     }
 
     fun selectNextIndex(candidates: List<TraversalCandidateState>): Int? {
@@ -23,11 +21,17 @@ class FocusTraversalPlanner {
 
         val currentIndex = currentIndex(candidates)
         if (currentIndex == null) {
-            return 0
+            return candidates.indexOfFirst { candidate -> candidate.canReceiveProgrammaticFocus() }
+                .takeIf { it >= 0 }
         }
 
-        val nextIndex = currentIndex + 1
-        return nextIndex.takeIf { it in candidates.indices }
+        for (index in currentIndex + 1 until candidates.size) {
+            if (candidates[index].canReceiveProgrammaticFocus()) {
+                return index
+            }
+        }
+
+        return null
     }
 
     fun selectPreviousIndex(candidates: List<TraversalCandidateState>): Int? {
@@ -37,17 +41,31 @@ class FocusTraversalPlanner {
 
         val currentIndex = currentIndex(candidates)
         if (currentIndex == null) {
-            return 0
+            return candidates.indexOfFirst { candidate -> candidate.canReceiveProgrammaticFocus() }
+                .takeIf { it >= 0 }
         }
 
-        val previousIndex = currentIndex - 1
-        return previousIndex.takeIf { it in candidates.indices }
+        for (index in currentIndex - 1 downTo 0) {
+            if (candidates[index].canReceiveProgrammaticFocus()) {
+                return index
+            }
+        }
+
+        return null
     }
 
     private fun currentIndex(candidates: List<TraversalCandidateState>): Int? {
         val currentIndex = candidates.indexOfFirst { candidate ->
-            candidate.hasAccessibilityFocus || candidate.hasInputFocus
+            candidate.isCurrentlyFocused()
         }
         return currentIndex.takeIf { it >= 0 }
+    }
+
+    private fun TraversalCandidateState.isCurrentlyFocused(): Boolean {
+        return hasAccessibilityFocus || hasInputFocus
+    }
+
+    private fun TraversalCandidateState.canReceiveProgrammaticFocus(): Boolean {
+        return supportsAccessibilityFocus || supportsInputFocusAction
     }
 }

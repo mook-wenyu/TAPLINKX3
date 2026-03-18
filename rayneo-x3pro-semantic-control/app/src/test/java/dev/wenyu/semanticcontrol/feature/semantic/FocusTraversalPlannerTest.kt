@@ -51,9 +51,9 @@ class FocusTraversalPlannerTest {
     fun `selectPreviousIndex returns first item when nothing is focused`() {
         val targetIndex = planner.selectPreviousIndex(
             listOf(
-                TraversalCandidateState(supportsInputFocus = true),
-                TraversalCandidateState(supportsInputFocus = true),
-                TraversalCandidateState(supportsInputFocus = true),
+                TraversalCandidateState(supportsInputFocusAction = true),
+                TraversalCandidateState(supportsInputFocusAction = true),
+                TraversalCandidateState(supportsInputFocusAction = true),
             ),
         )
 
@@ -64,8 +64,8 @@ class FocusTraversalPlannerTest {
     fun `selectPreviousIndex moves backward when a previous candidate exists`() {
         val targetIndex = planner.selectPreviousIndex(
             listOf(
-                TraversalCandidateState(supportsInputFocus = true),
-                TraversalCandidateState(supportsInputFocus = true),
+                TraversalCandidateState(supportsInputFocusAction = true),
+                TraversalCandidateState(supportsInputFocusAction = true),
                 TraversalCandidateState(hasInputFocus = true),
             ),
         )
@@ -78,8 +78,8 @@ class FocusTraversalPlannerTest {
         val targetIndex = planner.selectPreviousIndex(
             listOf(
                 TraversalCandidateState(hasInputFocus = true),
-                TraversalCandidateState(supportsInputFocus = true),
-                TraversalCandidateState(supportsInputFocus = true),
+                TraversalCandidateState(supportsInputFocusAction = true),
+                TraversalCandidateState(supportsInputFocusAction = true),
             ),
         )
 
@@ -111,5 +111,18 @@ class FocusTraversalPlannerTest {
         val result = planner.isTraversalCandidate(clickOnlyCandidate)
 
         assertEquals(false, result)
+    }
+
+    @Test
+    fun `selectNextIndex skips focusable-only candidate that lacks focus action`() {
+        val targetIndex = planner.selectNextIndex(
+            listOf(
+                TraversalCandidateState(hasInputFocus = true),
+                TraversalCandidateState(isFocusable = true),
+                TraversalCandidateState(supportsInputFocusAction = true),
+            ),
+        )
+
+        assertEquals(2, targetIndex)
     }
 }

@@ -89,7 +89,7 @@ class SemanticNavigator(
                 candidate.node.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS)
             }
 
-            candidate.state.supportsInputFocus -> {
+            candidate.state.supportsInputFocusAction -> {
                 candidate.node.performAction(AccessibilityNodeInfo.ACTION_FOCUS)
             }
 
@@ -113,8 +113,8 @@ class SemanticNavigator(
         return node.actionList.any { action -> action.id == AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS }
     }
 
-    private fun supportsInputFocus(node: AccessibilityNodeInfo): Boolean {
-        return node.actionList.any { action -> action.id == AccessibilityNodeInfo.ACTION_FOCUS } || node.isFocusable
+    private fun supportsInputFocusAction(node: AccessibilityNodeInfo): Boolean {
+        return node.actionList.any { action -> action.id == AccessibilityNodeInfo.ACTION_FOCUS }
     }
 
     private fun AccessibilityNodeInfo.toTraversalCandidateState(): TraversalCandidateState {
@@ -122,7 +122,8 @@ class SemanticNavigator(
             hasAccessibilityFocus = isAccessibilityFocused,
             hasInputFocus = isFocused,
             supportsAccessibilityFocus = supportsAccessibilityFocus(this),
-            supportsInputFocus = supportsInputFocus(this),
+            supportsInputFocusAction = supportsInputFocusAction(this),
+            isFocusable = isFocusable,
         )
     }
 

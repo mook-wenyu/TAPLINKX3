@@ -17,6 +17,8 @@ Create a standalone Android-native project for RayNeo X3 Pro semantic control, t
 | Analyze RayNeo vendor SDKs | completed | Reverse-inspected local AARs, compared Mercury versions, and mapped vendor capabilities into MVP, prototype, and deferred buckets. |
 | Implement vendor adapter bootstrap slice | completed | Added a RayNeo vendor boundary, wired Mercury bootstrap plus manifest handshake, and verified unit tests plus debug build in an isolated worktree. |
 | Implement TouchDispatcher input spike | completed | Added a minimal X3-native input adapter that maps `TouchDispatcherX3 + CommonTouchCallback` into existing semantic actions and verified unit tests plus debug build in an isolated worktree. |
+| Reframe enablement and shell route | completed | Confirmed X3 binocular shell as the near-term host, downgraded accessibility to enhancement-only, and added an optional mode state machine with honest recovery states. |
+| Start camera feasibility spike | in_progress | Added a foreground-only binocular camera probe activity plus unit-tested session tracking; physical-device validation is still pending. |
 
 ## Decisions
 
@@ -26,7 +28,7 @@ Create a standalone Android-native project for RayNeo X3 Pro semantic control, t
 - Keep gesture recognition behind replaceable abstractions.
 - Keep product scope small until accessibility audits are complete.
 - Build focus traversal before wiring pinch confirmation, because confirmation without a stable focus target is product drift.
-- Run the target-app audit before expanding into camera-backed gesture provider work.
+- Keep the target-app audit as a parallel evidence track, but do not let it block the foreground camera feasibility spike.
 - Treat RayNeo SDKs as hardware adaptation shims, not the app architecture.
 - Keep all `com.ffalcon*` references inside `vendor.rayneo`.
-- Stop feature growth after the input spike and shift to app audit before deeper vendor focus integration.
+- Treat the foreground camera feasibility spike as the next north-star blocker after shell/input infrastructure, before deeper vendor focus integration.

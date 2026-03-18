@@ -20,4 +20,28 @@
 - Bootstrapped Mercury through an internal runtime wrapper and added the RayNeo manifest handshake.
 - Added a minimal `TouchDispatcherX3 + CommonTouchCallback` input adapter that maps into existing semantic actions.
 - Added unit tests for the touch semantic bridge and kept the full build green.
-- Next: audit target apps before deciding whether vendor focus helpers are actually needed.
+- Initially synced the implementation plan toward an app-audit-first sequence after the TouchDispatcher spike; later evidence showed this ordering had drifted away from the north-star camera question and required correction.
+- Added `docs/app-audit.md` to define the first-wave audit rubric, target app categories, support tiers, and FocusTracker decision gate.
+- Added pure audit tiering types plus unit tests so `Generic`, `WhitelistCandidate`, and `Unsupported` can be derived consistently from tree, focusability, and activation signals.
+- Added an ADB-driven semantic debug bridge so device-side audits can trigger `dump-root`, `focus-next`, `focus-previous`, and `activate-focused` from the shell.
+- Logged the first live-device session in `docs/adb-debug-log.md`, including the successful enable path, the Android 12 broadcast restriction, and the first failing Settings homepage sample.
+- Fixed a real-device traversal bug by separating `isFocusable` from actual `ACTION_FOCUS` support.
+- Replaced the static homepage with a single AR-first setup card driven by accessibility-service state and a settings CTA.
+- Verified the homepage card on device: one centered card, concise Chinese copy, no overlay control surface, and a working settings handoff CTA.
+- Reassessed the device route using the local capability PDF, Mercury sample, and external evidence: for X3 Pro, binocular mirrored UI plus temple gestures should drive the user-visible shell, and the current single-layout homepage should be treated as temporary.
+- Migrated the homepage shell onto Mercury's mirrored activity path and added a small temple-action router for the single-card interaction model.
+- Verified the new shell compiles, passes tests, and launches on device without crashing; deeper binocular UI inspection still needs follow-up.
+- Added a homepage-specific ADB debug receiver and verified on device that homepage `click` opens accessibility settings and `double-click` exits back to the launcher.
+- Audited the accessibility enable path and downgraded user-driven settings enablement to a pending/high-risk path: homepage handoff is verified, but end-to-end settings navigation by temple gestures is still unproven.
+- Refined the next step for enable-path validation: expand settings-page semantic snapshot detail before making stronger claims about temple-only enablement.
+- Verified a stronger blocker on device: switching to Android Settings can force-stop the app process, which breaks any in-process semantic assist path during the enable flow.
+- Converted the enablement decision into a strategy matrix: accessibility is now the default enhancement-only layer, OEM/preinstall stays as the secondary high-upside path, companion-phone enablement remains exploratory, and ADB stays dev-only.
+- Broke the replacement strategy into explicit next tasks: optional accessibility mode state machine, OEM/preinstall feasibility track, and a tightly scoped companion-phone exploration track.
+- Implemented the optional accessibility mode state machine so the homepage now persists `native-only` vs `accessibility-enhanced`, upgrades when the service is truly connected, and falls back to an honest recovery state when enhancement is unavailable.
+- Reduced the camera-vision next step to a strict feasibility spike: foreground camera availability, frame stability, and hand-in-frame usefulness only.
+- Corrected the plan drift: target-app audit remains important, but no longer blocks the next north-star proof task.
+- Added a foreground-only binocular camera probe activity, keeping the homepage product surface unchanged while creating a real host for `Task 15` device validation.
+- Added a unit-tested camera feasibility session tracker so first-frame latency, analyzed frame count, and error states are recorded without tangling Android camera APIs into pure reporting logic.
+- Added an internal homepage debug command to launch the camera probe without expanding the user-facing homepage CTA surface.
+- Confirmed that the current session could not run device validation because `adb devices -l` still returned no connected glasses after restarting the daemon.
+- Next: run the new camera probe on physical X3 Pro hardware, document frame stability and hand visibility, then decide whether app-audit or perception-pipeline follow-up should come first.

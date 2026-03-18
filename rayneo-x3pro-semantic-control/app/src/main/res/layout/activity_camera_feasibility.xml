@@ -3,21 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
+    android:background="@android:color/black"
     android:paddingHorizontal="@dimen/homepage_screen_padding_horizontal"
     android:paddingVertical="@dimen/homepage_screen_padding_vertical">
 
+    <TextureView
+        android:id="@+id/cameraPreview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/setupCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="top|center_horizontal"
         android:maxWidth="@dimen/homepage_card_max_width"
-        app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+        app:cardBackgroundColor="#CC111111"
         app:cardCornerRadius="@dimen/homepage_card_corner_radius"
         app:cardElevation="@dimen/homepage_card_elevation"
-        app:strokeColor="?attr/colorOutlineVariant"
-        app:strokeWidth="@dimen/homepage_card_stroke_width">
+        app:strokeColor="@android:color/transparent"
+        app:strokeWidth="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -26,47 +30,37 @@
             android:padding="@dimen/homepage_card_padding">
 
             <TextView
-                android:id="@+id/titleText"
+                android:id="@+id/probeTitleText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start"
-                android:textAlignment="viewStart"
-                android:textColor="?attr/colorOnSurface"
+                android:textColor="@android:color/white"
                 android:textSize="@dimen/homepage_title_text_size"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/statusText"
+                android:id="@+id/probeStatusText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/homepage_content_spacing"
-                android:gravity="start"
-                android:textAlignment="viewStart"
-                android:textColor="?attr/colorPrimary"
+                android:textColor="@android:color/white"
                 android:textSize="@dimen/homepage_body_text_size"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/helperText"
+                android:id="@+id/probeDetailText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/homepage_content_spacing"
-                android:gravity="start"
-                android:textAlignment="viewStart"
-                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textColor="#FFD7D7D7"
                 android:textSize="@dimen/homepage_body_text_size" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/primaryButton"
-                style="@style/Widget.Material3.Button"
+            <TextView
+                android:id="@+id/probeHintText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/homepage_button_margin_top"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:minHeight="@dimen/homepage_button_min_height"
+                android:layout_marginTop="@dimen/homepage_content_spacing"
+                android:textColor="#FFB8C7D9"
                 android:textSize="@dimen/homepage_body_text_size" />
-
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </FrameLayout>

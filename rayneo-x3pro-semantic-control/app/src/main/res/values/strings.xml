@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Semantic Control</string>
-    <string name="launcher_summary">独立 Android 项目骨架已创建。当前版本已经收敛为单 app 模块，使用包级分层组织 Accessibility、手势、语义动作与 HUD 占位实现。</string>
-    <string name="architecture_header">当前结构</string>
-    <string name="architecture_body">单 app 模块 + 包级分层：app、core.contracts、feature.gesture、feature.overlay、feature.semantic。</string>
-    <string name="next_steps_header">下一步</string>
-    <string name="next_steps_body">1. 接入 AccessibilityService。 2. 接入 pinch-confirm 输入链。 3. 建立焦点导航与 HUD 反馈。 4. 做首批目标 App 审计与白名单策略。</string>
     <string name="a11y_service_label">Semantic Control Service</string>
-    <string name="a11y_service_description">基于 Accessibility 的语义控制服务骨架。</string>
+    <string name="a11y_service_description">基于 Accessibility 的语义控制服务，当前已接入焦点遍历、安全激活与 RayNeo 最小输入适配。</string>
+    <string name="homepage_title">语义控制模式</string>
+    <string name="homepage_status_native_only">原生模式</string>
+    <string name="homepage_status_enhancement_active">增强模式已开启</string>
+    <string name="homepage_status_needs_attention">需检查</string>
+    <string name="homepage_helper_native_only">当前优先使用镜腿与合目界面；开启无障碍可增强跨应用控制。</string>
+    <string name="homepage_helper_enhancement_active">增强模式已就绪，可继续使用跨应用语义控制。</string>
+    <string name="homepage_helper_needs_attention">你选择了增强模式，但服务当前未就绪，请前往设置检查。</string>
+    <string name="homepage_cta_enable_enhancement">开启增强模式</string>
+    <string name="homepage_cta_review_service">查看设置</string>
+    <string name="homepage_cta_check_service">去检查</string>
+    <string name="camera_probe_title">前台相机可行性探针</string>
 </resources>

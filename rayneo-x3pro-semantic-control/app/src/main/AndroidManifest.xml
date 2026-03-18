@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false" />
+
     <application
         android:name=".SemanticControlApplication"
         android:allowBackup="true"
@@ -14,6 +19,11 @@
             android:value="true" />
 
         <activity
+            android:name=".CameraFeasibilityActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -22,6 +32,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name="dev.wenyu.semanticcontrol.feature.semantic.debug.SemanticDebugReceiver"
+            android:permission="android.permission.DUMP"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="dev.wenyu.semanticcontrol.debug.ACTION_COMMAND" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="dev.wenyu.semanticcontrol.app.HomepageDebugReceiver"
+            android:permission="android.permission.DUMP"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="dev.wenyu.semanticcontrol.debug.ACTION_HOMEPAGE_COMMAND" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name="dev.wenyu.semanticcontrol.feature.semantic.SemanticAccessibilityService"
