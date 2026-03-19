@@ -204,10 +204,25 @@
 - [x] Add a foreground-only binocular camera probe host without changing the homepage product CTA surface
 - [x] Add unit-tested session tracking for opening state, first-frame latency, analyzed-frame count, and error reporting
 - [x] Keep the spike explicitly scoped away from background residency, MediaPipe integration, multi-gesture vocabulary, HUD polish, and cross-app control
-- [ ] Answer one narrow question only on physical hardware: can a standard third-party X3 Pro app, while foregrounded inside the current binocular shell, access a usable camera stream that actually shows the wearer’s hand well enough for a later single-gesture semantic prototype?
-- [ ] Define success as: public foreground camera access works, frames are lifecycle-stable for a short session, and the hand is visible enough to justify later egocentric gesture inference
+- [x] Answer one narrow question only on physical hardware: can a standard third-party X3 Pro app, while foregrounded inside the current binocular shell, access a usable camera stream that actually shows the wearer’s hand well enough for a later single-gesture semantic prototype?
+- [x] Define success as: public foreground camera access works, frames are lifecycle-stable for a short session, and the hand is visible enough to justify later egocentric gesture inference
 - [ ] Define failure as: camera access is blocked/fragile, hand visibility is physically unusable, or the spike only works through private/vendor-only assumptions
-- [ ] Route success to a follow-up `single-gesture foreground recognizer` spike; route failure to OEM/preload dependency escalation instead of more app-side CV work
+- [x] Route success to a follow-up `single-gesture foreground recognizer` spike; route failure to OEM/preload dependency escalation instead of more app-side CV work
+
+## Task 16: Single-Gesture Foreground Recognizer Spike
+
+**Files:**
+- Modify: `rayneo-x3pro-semantic-control/app/build.gradle.kts`
+- Create: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/feature/camera/recognizer/...`
+- Modify: `rayneo-x3pro-semantic-control/app/src/main/java/dev/wenyu/semanticcontrol/app/CameraFeasibilityActivity.kt`
+- Modify: `rayneo-x3pro-semantic-control/docs/IMPLEMENTATION_PLAN.md`
+- Modify: `rayneo-x3pro-semantic-control/docs/PROGRESS.md`
+
+- [ ] Keep scope to one foreground-only gesture semantic, not a vocabulary
+- [ ] Reuse the current binocular camera probe host instead of creating a second camera stack
+- [ ] Prefer the smallest reliable recognizer path that answers “can one gesture be recognized stably enough to drive one semantic action?”
+- [ ] Explicitly exclude background residency, global cross-app control claims, and product UX polish
+- [ ] Route success to a later semantic-action wiring experiment; route failure to “camera visible but recognition insufficient” rather than pretending Task 15 failed
 
 ## Task 5: App Audit and Whitelist Strategy
 

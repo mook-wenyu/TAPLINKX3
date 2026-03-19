@@ -276,3 +276,92 @@ adb shell pm grant dev.wenyu.semanticcontrol.debug android.permission.CAMERA
 - These commands were prepared after the code spike, but they are **not yet verified on device**.
 - Do not treat this section as evidence that camera access already works; it only records the exact preflight path for the next session.
 - During this session, `adb kill-server && adb start-server && adb devices -l` still returned **no connected devices**, so the probe could not be run on hardware yet.
+
+## 2026-03-19 - Camera feasibility spike device validation
+
+### Device state
+
+- `adb devices -l` returned a live X3 Pro device:
+  - serial: `BC942490E32E972`
+  - model: `ARGF20`
+  - product: `RayNeoX3Pro`
+
+### Commands that succeeded
+
+```bash
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+```bash
+adb shell pm grant dev.wenyu.semanticcontrol.debug android.permission.CAMERA
+```
+
+```bash
+adb shell am start -n dev.wenyu.semanticcontrol.debug/dev.wenyu.semanticcontrol.app.MainActivity
+```
+
+```bash
+adb shell am broadcast --receiver-foreground \
+  -n dev.wenyu.semanticcontrol.debug/dev.wenyu.semanticcontrol.app.HomepageDebugReceiver \
+  -a dev.wenyu.semanticcontrol.debug.ACTION_HOMEPAGE_COMMAND \
+  --es command open-camera-probe
+```
+
+Result:
+
+- broadcast returned `result=0, data="open-camera-probe:ok"`
+- `ActivityTaskManager` logged launch of `dev.wenyu.semanticcontrol.debug/dev.wenyu.semanticcontrol.app.CameraFeasibilityActivity`
+
+### Foreground stream evidence
+
+Logcat showed stable foreground streaming from the probe:
+
+- status: `Streaming`
+- camera: `cameraId=0`
+- resolution: `1280x720`
+- first frame latency, first run: about `436ms`
+- analyzed frames on first long run: grew past `2130`
+
+Representative log line:
+
+```text
+I CameraFeasibility: Camera probe snapshot: CameraFeasibilitySnapshot(status=Streaming, cameraId=0, resolution=CameraProbeResolution(width=1280, height=720), analyzedFrames=2130, firstFrameLatencyMs=436, ...)
+```
+
+### Hand-in-frame evidence
+
+- Screenshot `rayneo-camera-probe.png` showed:
+  - the probe overlay text rendered correctly,
+  - a live desk/laptop scene behind it,
+  - a clearly visible hand entering the lower center-right of the frame.
+
+This is enough evidence to say the wearer’s hand can enter the usable foreground camera view for a later single-gesture prototype.
+
+### Reopen / short-session lifecycle evidence
+
+After exiting the probe and reopening it:
+
+- the activity relaunched successfully,
+- the probe moved through `Idle -> Opening -> Streaming`,
+- first frame latency on reopen was about `395ms`,
+- analyzed frames continued growing (`1`, `30`, `60`, ... `1230`) without `camera-error`, `session-config-failed`, or `preview-surfaces-unavailable`.
+
+Representative reopen log lines:
+
+```text
+I CameraFeasibility: Camera probe snapshot: CameraFeasibilitySnapshot(status=Opening, cameraId=0, resolution=CameraProbeResolution(width=1280, height=720), analyzedFrames=0, firstFrameLatencyMs=null, ...)
+I CameraFeasibility: Camera probe snapshot: CameraFeasibilitySnapshot(status=Streaming, cameraId=0, resolution=CameraProbeResolution(width=1280, height=720), analyzedFrames=1, firstFrameLatencyMs=395, ...)
+```
+
+### Screenshot caveat
+
+- The first immediate screenshot taken after reopen captured only a dark/status-bar-dominant frame.
+- A delayed screenshot taken a few seconds later again showed the live camera scene and visible hand.
+- Interpretation: screenshot timing around reopen is less stable than log evidence, so stream validity should be judged primarily by `CameraFeasibility` logs and secondarily by screenshots.
+
+### Conclusion
+
+- **Foreground camera access works** for the current X3 Pro third-party binocular-shell app.
+- **Short-session lifecycle stability is good enough** for the next prototype step.
+- **Hand visibility is sufficient** to justify a tightly scoped follow-up foreground recognizer task.
+- This does **not** prove background-resident camera viability.

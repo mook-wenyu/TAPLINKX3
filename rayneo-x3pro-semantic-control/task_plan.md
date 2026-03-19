@@ -18,7 +18,8 @@ Create a standalone Android-native project for RayNeo X3 Pro semantic control, t
 | Implement vendor adapter bootstrap slice | completed | Added a RayNeo vendor boundary, wired Mercury bootstrap plus manifest handshake, and verified unit tests plus debug build in an isolated worktree. |
 | Implement TouchDispatcher input spike | completed | Added a minimal X3-native input adapter that maps `TouchDispatcherX3 + CommonTouchCallback` into existing semantic actions and verified unit tests plus debug build in an isolated worktree. |
 | Reframe enablement and shell route | completed | Confirmed X3 binocular shell as the near-term host, downgraded accessibility to enhancement-only, and added an optional mode state machine with honest recovery states. |
-| Start camera feasibility spike | in_progress | Added a foreground-only binocular camera probe activity plus unit-tested session tracking; physical-device validation is still pending. |
+| Start camera feasibility spike | completed | Added a foreground-only binocular camera probe activity, validated stable foreground streaming on X3 Pro hardware, and confirmed the wearer’s hand can enter the usable frame. |
+| Define next recognizer spike | completed | Promoted a one-gesture foreground recognizer spike as the next minimal task after camera viability was proven. |
 
 ## Decisions
 
