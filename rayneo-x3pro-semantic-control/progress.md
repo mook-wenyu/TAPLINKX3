@@ -44,4 +44,8 @@
 - Added a unit-tested camera feasibility session tracker so first-frame latency, analyzed frame count, and error states are recorded without tangling Android camera APIs into pure reporting logic.
 - Added an internal homepage debug command to launch the camera probe without expanding the user-facing homepage CTA surface.
 - Confirmed that the current session could not run device validation because `adb devices -l` still returned no connected glasses after restarting the daemon.
+- After the glasses were reconnected, validated the foreground camera probe on device: the activity launched, the stream entered `Streaming`, first-frame latency stayed sub-500ms, and the hand was visible in captured screenshots.
+- Reopened the probe and verified a fresh `Idle -> Opening -> Streaming` cycle with new first-frame timing, confirming short-session lifecycle stability instead of stale state reuse.
 - Next: run the new camera probe on physical X3 Pro hardware, document frame stability and hand visibility, then decide whether app-audit or perception-pipeline follow-up should come first.
+
+- Next: start a single-gesture foreground recognizer spike that reuses the current probe host and answers whether one minimal gesture can be recognized stably enough to justify later semantic wiring.

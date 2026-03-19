@@ -56,19 +56,23 @@
 - 为首页调试路由新增 `open-camera-probe` 内部命令，让下一轮真机调试可以直接从当前双屏壳层跳入相机探针页
 - 新增 `CAMERA` 权限和可选 `camera.any` feature 声明，但仍然明确限制在前台 activity 探针，不引入前台服务或后台常驻承诺
 - 本轮再次执行 `adb kill-server && adb start-server && adb devices -l`，结果仍然没有在线设备，因此 `Task 15` 的真机取流验证尚未开始
+- 后续设备重新连上后，已完成 `Task 15` 真机验证：debug APK 安装成功、`open-camera-probe` 广播成功拉起 `CameraFeasibilityActivity`、前台取流稳定进入 `Streaming`
+- 首轮取流日志显示 `cameraId=0`、`1280x720`、首帧约 `436ms`，分析帧数增长到 `2130+`，未见 `camera-error` 或 session 失败信号
+- 截图 `rayneo-camera-probe.png` 显示了真实桌面/笔记本场景和进入画面的手部，说明“手是否在画面里”这个关键问题得到正向证据
+- 退出后再次打开 probe 也成功从 `Idle -> Opening -> Streaming` 重新取流，重开首帧约 `395ms`，说明前台短时生命周期稳定性达到下一步实验要求
+- 记录到一个截图层面的 caveat：重开后的第一张即时截图偏黑，但延时截图恢复正常 live preview，因此后续判断应以 `CameraFeasibility` 日志为主、截图为辅
 
 ### 未完成
 
 - App 审计与白名单策略
-- 前台 camera probe 的真机验证与日志沉淀
 - 是否需要 `FocusTracker / RecyclerViewFocusTracker` 的真机判断
 - 相机 hand-tracking provider 是否仍有必要的复盘判断
 - 系统无障碍设置页的端到端镜腿可操作性验证
 - 替代无障碍启用链方案评估（OEM / 伴生端 / 预装）
 - `accessibility-enhanced` 与 `needs-attention` 的更细真机状态可视化验证
-- `camera-vision feasibility spike`
+- `single-gesture foreground recognizer spike`
 
-说明：当前 feature work 已完成到 MVP 所需的确认链路、Mercury bootstrap、`TouchDispatcherX3` 输入 spike，以及 `Task 15` 的前台 camera probe 代码准备。下一步不再是抽象争论，而是真机运行这个 probe，拿到前台取流、短时稳定性与手在画面中的直接证据；App 审计继续并行，但不再阻塞这个 camera spike。
+说明：当前 feature work 已完成到 MVP 所需的确认链路、Mercury bootstrap、`TouchDispatcherX3` 输入 spike，以及 `Task 15` 的前台 camera feasibility 设备验证。下一步不再是证明“相机能不能开起来”，而是收紧到 `single-gesture foreground recognizer spike`：只验证一个最小手势语义能否在当前前台流里稳定成立；App 审计继续并行，但不再阻塞这条前台视觉主线。
 
 ### 当前判断
 
@@ -80,5 +84,6 @@
 - 不在没有 App 审计结果前承诺“全局支持”
 - 不在没有前台 camera probe 设备证据前承诺“摄像机视觉可行”
 - App 审计继续并行，但不再阻塞当前 camera feasibility spike。
+- 当前可以诚实地说：前台第三方相机流 + 手进入画面已经被设备验证，但后台常驻视觉仍未被证明。
 - `MercuryAndroidSDK` 可作为 X3-native input shim 候选，但不应上升为应用主架构。
 - `RayNeoIPCSDK` 暂不进入 MVP 主路径。
